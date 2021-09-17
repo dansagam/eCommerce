@@ -1,0 +1,12 @@
+import React from 'react'
+
+const AppHeader = () => {
+   return (
+      <div>
+         <h1>header builder</h1>
+         
+      </div>
+   )
+}
+
+export default AppHeader
