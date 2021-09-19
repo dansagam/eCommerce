@@ -1,52 +1,38 @@
 import React from 'react'
 import { Image, Carousel } from 'react-bootstrap'
+import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
+import AppLoader from './AppLoader'
+import Message from './Message'
 
 const AppCarousels = () => {
-   return (
+   const productList = useSelector(state => state.Product)
+   const {loading, error, products} = productList
+
+   
+   return loading  ? (
+      <AppLoader />
+   ) : error ? (
+      <Message variant='danger' >{error}</Message>
+   ) : (
       <>
          <Carousel pause='hover' className='bg-dark carousel' fade>
-            <Carousel.Item className='carousel-item'>
-               <Link to={`/product/${'sdksjdfje'}`}>
+            {products.map((product) => (
+            <Carousel.Item key={product._id} className='carousel-item'>
+               <Link to={`/product/${product._id}`}>
                   <Image
                      className="d-block"
-                     // src="holder.js/800x400?text=First slide&bg=373940"
-                     src="/images/airpods.jpg"
+                     src={`${product.image}`}
                      alt="First slide"
                      fluid
                   />
                   <Carousel.Caption className='carousel-caption'>
-                     <h3>First slide label</h3>
+                     <h3>{product.name} {product.price}</h3>
                   </Carousel.Caption>
                </Link>
             </Carousel.Item>
-            {/* <Carousel.Item>
-               <Image
-                  className="d-block w-100"
-                  // src="holder.js/800x400?text=Second slide&bg=282c34"
-                  src="/images/airpods.jpg"
-                  alt="Second slide"
-                  fluid
-               />
-               <Carousel.Caption>
-                  <h3>Second slide label</h3>
-                  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-               </Carousel.Caption>
-            </Carousel.Item>
-            <Carousel.Item>
-               <Image
-                  className="d-block w-100"
-                  // src="holder.js/800x400?text=Third slide&bg=20232a"
-                  src="/images/airpods.jpg"
-                  alt="Third slide"
-                  fluid
-               />
-            
-               <Carousel.Caption>
-                  <h3>Third slide label</h3>
-                  <p>Praesent commodo cursus magna, vel scelerisque nisl consectetur.</p>
-               </Carousel.Caption>
-            </Carousel.Item> */}
+
+            ))}
          </Carousel>
          
       </>
