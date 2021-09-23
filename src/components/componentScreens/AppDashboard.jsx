@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Col, Row } from 'react-bootstrap'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { getProduct } from '../../reduxReducers/productReducers'
 import AppCarousels from '../componentParts/AppCarousels'
 import AppLoader from '../componentParts/AppLoader'
 import Message from '../componentParts/Message'
@@ -10,10 +11,14 @@ import PaginationContainer from '../componentParts/PaginationContainer'
 import Product from '../componentParts/Product'
 
 const AppDashboard = ({match}) => {
+   const dispatch = useDispatch()
    const keyword = match.params.keyword
-   // const pageNumber = match.params.pageNumber || 1
+   const pageNumber = match.params.pageNumber || 1
    const productList = useSelector(state => state.Product)
-   const {products, page, pages, error, loading} = productList
+   const { /** products*/ productSearch, page, pages, error, loading} = productList
+   useEffect(() => {
+      dispatch(getProduct(keyword, pageNumber))
+   },[dispatch, keyword, pageNumber])
    return (
       <>
          <MetaData />
@@ -32,7 +37,7 @@ const AppDashboard = ({match}) => {
          ) : (
             <>
                <Row>
-                  {products.map((product) => (
+                  {productSearch.map((product) => (
                      <Col key={product._id} sm={12} md={6} lg={4} xl={3}>
                         <Product product={product} />
                      </Col>

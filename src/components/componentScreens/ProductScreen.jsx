@@ -1,28 +1,41 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button, Card, Col, Form, Image, ListGroup, Row, FloatingLabel } from 'react-bootstrap'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { getProductDetailsById, itemReviewCreation } from '../../reduxReducers/productReducers'
 import AppLoader from '../componentParts/AppLoader'
 import Message from '../componentParts/Message'
 import MetaData from '../componentParts/MetaData'
 import Ratings from '../componentParts/Ratings'
 
 const ProductScreen = ({history, match}) => {
+   const dispatch = useDispatch()
    const [qty, setQty] = useState(0)
    const [rating, setRating] = useState(0)
    const [comment, setComment] = useState('')
 
 
-   const product = useSelector(
+   const productGen = useSelector(
       state => state.Product.products
       ).filter(item => item._id === match.params.id)[0]
-   const {loading, error} = useSelector(state => state.Product)
-   // useEffect(() => {
-   //    const pl = product
-   // })
+   const {loading, error, product, } = useSelector(state => state.Product)
+   
+   useEffect(()=>{
+      if (productGen){
+         setRating(0)
+         setComment('')
+      }
+      if(!product._id || product._id !== match.params.id){
+         dispatch(getProductDetailsById(match.params.id))
+      }
+   },[dispatch, match, product, loading, productGen])
+
+   console.log(match.params.id, product)
 
    const submitHandler =(e)=>{
       e.preventDefault()
+      dispatch(itemReviewCreation(match.params.id, {comment: comment, rating: rating}))
+      dispatch(getProductDetailsById(match.params.id))
    }
    const addToCartHandler = () => {
       history.push(`/cart/${match.params.id}?qty=${qty}`)
@@ -32,6 +45,7 @@ const ProductScreen = ({history, match}) => {
          <Link to='/' className='btn btn-light my-3'>Go Back</Link>
          {loading ? <AppLoader />
          : error ? <Message variant='danger'>{error}</Message>
+         : !product ? <h1>enter the flag</h1>
          :(
             <>
                <MetaData title={product.name}  />
@@ -159,9 +173,9 @@ const ProductScreen = ({history, match}) => {
 
 
                            
-                           {/* <Message>
+                           <Message>
                               Please <Link to='/login'>sign in</Link> to write a review{' '}
-                           </Message> */}
+                           </Message>
                         </ListGroup.Item>
                      </ListGroup>
                   </Col>
