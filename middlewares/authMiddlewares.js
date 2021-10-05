@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken"
+import Reviews from "../models/reviewModel.js"
 import User from "../models/userModel.js"
 
 
@@ -45,6 +46,23 @@ const adminAuth = (req, res, next) => {
 }
 
 
+const reviewOwnershipAuth = (req, res, next) => {
+   try {
+      const foundReviews =  Reviews.findById(req.params.id)
+      if (foundReviews){
+         if(foundReviews.user.equals(req.user._id)){
+            next()
+         }else{
+            res.status(401)
+            throw new Error('Ownership not verified')
+         }
+      }
+   } catch (err) {
+      
+   }
+}
 
 
-export {adminAuth, userAuth} 
+
+
+export {adminAuth, userAuth, reviewOwnershipAuth} 
