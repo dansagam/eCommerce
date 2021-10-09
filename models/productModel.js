@@ -16,18 +16,23 @@ const productSchema = new mongoose.Schema(
          require: true
       },
       brand: {
-      type: String,
-      required: true,
+         type: String,
+         required: true,
       },
       category: {
-      type: String,
-      required: true,
+         type: String,
+         required: true,
       },
       description: {
-      type: String,
-      required: true,
+         type: String,
+         required: true,
       },
-      // reviews: [reviewSchema],
+      reviews: [
+         {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Reviews'
+         }
+      ],
       // reviews: {
       //    type: mongoose.Schema.Types.ObjectId,
       //    ref: 'Reviews'
