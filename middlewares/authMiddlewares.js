@@ -50,13 +50,12 @@ const reviewOwnershipAuth = async (req, res, next) => {
    try {
        req.reviews = await Reviews.findById(req.params.review_id)
       if (req.reviews){
-         next()
-         // if(req.reviews.user.equals(req.user._id)){
-         //    next()
-         // }else{
-         //    res.status(401)
-         //    throw new Error('Ownership not verified')
-         // }
+         if(req.reviews.user.equals(req.user._id)){
+            next()
+         }else{
+            res.status(401)
+            throw new Error('Ownership not verified')
+         }
       }
    } catch (err) {
       res.status(404)
