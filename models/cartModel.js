@@ -4,27 +4,33 @@ const cartSchema = mongoose.Schema(
    {
       user: {
          type: mongoose.Schema.Types.ObjectId,
-         require: true,
+         required: true,
          ref: 'User'
       },
-      orderItem: [
+      cartItems: [
          {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'Order'
+            ref: 'CartItem'
          }
       ],
       paymentMethod: {
          type: String,
          enum: ['cash', 'online', 'bank'],
-         require: true,
+         required: true,
          default: 'online',
 
       },
+      status: {
+         type: String,
+         enum: ["active", "inactive"],
+         required: true,
+         default: "active"
+      },
       shippingAddress: {
          address: {type: String},
-         city: {type: String, require: true},
-         postalCode: {type: String, require: false},
-         country: { type: String, require: true}
+         city: {type: String, required: true},
+         postalCode: {type: String, required: false},
+         country: { type: String, required: true}
       },
       paymentResult: {
          id: {type: String},
@@ -34,35 +40,27 @@ const cartSchema = mongoose.Schema(
       },
       taxPrice: {
          type: Number,
-         require: true,
+         required: true,
          default: 0.0
       },
       shippingPrice: {
          type: Number,
-         require: true,
+         required: true,
          default: 0.0
       },
       totalPrice: {
          type: Number,
-         require: true,
+         required: true,
          default: 0.0
       },
       isPaid: {
          type: Boolean,
-         require: true,
+         required: true,
          default: false
       },
       paidAt: {
          type: Date
       },
-      isDelivered: {
-         type: Boolean,
-         require: true,
-         default: false
-      },
-      deliveredAt: {
-         type: Date
-      }
    },
    {
       timestamps: true,

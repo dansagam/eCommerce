@@ -2,25 +2,25 @@ import mongoose from 'mongoose';
 
 const orderSchema = new mongoose.Schema(
   {
-    product: {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
-      require: true,
-      ref: 'Product'
+      required: true,
+      ref: 'User'
+
     },
-    qty: {
-      type: Number,
-      require: true,
-      default: 1,
+    cart: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: 'Cart'
     },
-    price: {
-      type: Number,
-      require: true,
-      default: 0
+    isDelivered: {
+      type: Boolean,
+      required: true,
+      default: false
     },
-    image: {
-      type: String,
-      require: false
-    }, 
+    deliveredAt: {
+      type: Date
+    }
   },
   {
     timestamps: true,

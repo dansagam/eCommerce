@@ -5,7 +5,7 @@ const userSchema = new mongoose.Schema(
    {
       name: {
          type: String,
-         require: true,
+         required: true,
       },
       password :{
          type: String,
@@ -13,17 +13,17 @@ const userSchema = new mongoose.Schema(
       },
       email: {
          type: String,
-         require: true
+         required: true
       },
       isAdmin: {
          type: Boolean,
-         require: true,
+         required: true,
          default: false
       },
       status: {
          type: String,
          enum: ['active', 'inactive'],
-         require: true,
+         required: true,
          default: 'active'
       }
    },
