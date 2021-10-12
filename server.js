@@ -8,6 +8,7 @@ import productRoutes from './routes/productRoutes.js'
 import orderRoutes from './routes/orderRoutes.js'
 import storeRoutes from './routes/storeRoutes.js'
 import reviewRoutes from './routes/reviewRoutes.js'
+import cartRoutes from './routes/cartRoutes.js'
 import { errorHandler, notFound } from './middlewares/errorMiddlewares.js'
 
 
@@ -26,6 +27,7 @@ app.use(express.json())
 app.use('/api/products', productRoutes)
 app.use('/api/product', reviewRoutes)
 app.use('/api/users', userRoutes)
+app.use('/api/carts', cartRoutes)
 app.use('/api/orders', orderRoutes)
 app.use('/api/stores', storeRoutes)
 
