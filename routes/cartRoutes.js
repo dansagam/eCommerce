@@ -1,30 +1,37 @@
 import express from "express";
-import { 
-   getCarts,
-   addCartItems, 
+import {
+   addCartItems,
    getCartById,
    deleteCartItem,
    updateCartItem,
-   updateCartToDelivered,
-   updateCartToPaid
+   updateCartToPaid,
+   updateCartShippingAddress,
+   updateCartDeliveryMode
 } from "../controllers/cartControllers.js";
+import { userAuth } from "../middlewares/authMiddlewares.js";
 
 const router = express.Router()
 
 
 
 router.route('/')
-   .get(getCarts)
-   .post(addCartItems)
+   .post(userAuth, addCartItems)
+
 router.route('/:id')
-   .get(getCartById)
+   .get(userAuth, getCartById)
+
 router.route('/:id/pay')
-   .put(updateCartToPaid)
-router.route('/:id/deliver')
-   .put(updateCartToDelivered)
+   .put(userAuth, updateCartToPaid)
+
+router.route('/:id/shipping')
+   .put(userAuth, updateCartShippingAddress)
+
+router.route('/:id/deliveryMode')
+   .put(userAuth, updateCartDeliveryMode)
+
 
 router.route('/:id/item/:itemId')
-   .delete(deleteCartItem)
-   .put(updateCartItem)
+   .delete(userAuth, deleteCartItem)
+   .put(userAuth, updateCartItem)
 
 export default router

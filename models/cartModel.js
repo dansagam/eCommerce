@@ -27,16 +27,19 @@ const cartSchema = mongoose.Schema(
          default: "active"
       },
       shippingAddress: {
-         address: {type: String},
-         city: {type: String, required: true},
-         postalCode: {type: String, required: false},
-         country: { type: String, required: true}
+         type: mongoose.Schema.Types.ObjectId,
+         ref: 'ShippingAddress'
+      },
+      deliveryMode: {
+         type: String,
+         enum: ["Door Delivery", "Pickup Station"],
+         default: "Door Delivery"
       },
       paymentResult: {
-         id: {type: String},
-         status:{type: String},
-         update_time: {type: String},
-         email_address:{type: String}
+         id: { type: String },
+         status: { type: String },
+         update_time: { type: String },
+         email_address: { type: String }
       },
       taxPrice: {
          type: Number,
