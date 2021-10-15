@@ -4,7 +4,7 @@ import Reviews from "../models/reviewModel.js";
 
 
 
-export const getProducts = async(req, res, next) => {
+export const getProducts = async (req, res, next) => {
    try {
       const pageSize = 10
       const page = req.query.pageNumber || 1
@@ -14,8 +14,8 @@ export const getProducts = async(req, res, next) => {
             $option: 'i',
          },
       } : {}
-      const countDoc = await Product.countDocuments({...keyword})
-      const products = await Product.find({...keyword}).limit(pageSize).skip(pageSize * (page - 1))
+      const countDoc = await Product.countDocuments({ ...keyword })
+      const products = await Product.find({ ...keyword }).limit(pageSize).skip(pageSize * (page - 1))
       return res.status(201).json({
          success: true,
          count: products.length,
@@ -25,11 +25,11 @@ export const getProducts = async(req, res, next) => {
             pages: Math.ceil(countDoc / pageSize)
          }
       })
-      
+
    } catch (err) {
       res.status(401)
       next(err)
-      
+
    }
 
 }
@@ -41,7 +41,7 @@ export const getProducts = async(req, res, next) => {
     @access private
 */
 
-export const getProductById = async(req, res, next) => {
+export const getProductById = async (req, res, next) => {
    try {
       const product = await Product.findById(req.params.id).populate('reviews')
       if (product) {
@@ -49,7 +49,7 @@ export const getProductById = async(req, res, next) => {
             success: true,
             data: product
          })
-      } else{
+      } else {
          res.status(400)
          throw Error('Product not Found')
       }
@@ -59,7 +59,7 @@ export const getProductById = async(req, res, next) => {
    }
 }
 
-export const createProduct = async(req, res, next) => {
+export const createProduct = async (req, res, next) => {
    try {
       const {
          category,
@@ -74,24 +74,24 @@ export const createProduct = async(req, res, next) => {
       const product = await Product.create({
          name: name,
          price: price,
-         // user: req.user._id,
-         image: '/images/sample.jpg',
+         user: req.user._id,
+         image: req.file.filename,
          brand: brand,
          category: category,
          countInStock: 0,
          numReviews: 0,
          description: description,
-       })
+      })
 
-       if(product){
+      if (product) {
          return res.status(201).json({
             success: true,
             data: product
          })
-       }else{
-          res.status(404)
-          throw Error('Documents not saved')
-       }
+      } else {
+         res.status(404)
+         throw Error('Documents not saved')
+      }
    } catch (err) {
       res.status(404).json({
          success: false,
@@ -99,7 +99,7 @@ export const createProduct = async(req, res, next) => {
       })
       // next(err)
 
-      
+
    }
 }
 
@@ -110,15 +110,15 @@ export const createProduct = async(req, res, next) => {
     @access private
 */
 
-export const deleteProduct = async(req, res, next) =>{
+export const deleteProduct = async (req, res, next) => {
    try {
       const product = await Product.findByIdAndRemove(req.params.id)
-      if(product){
+      if (product) {
          return res.status(201).json({
             success: true,
             message: 'Product Deleted successfull'
          })
-      }else{
+      } else {
          res.status(400)
          throw Error('Product not Found')
 
@@ -126,7 +126,7 @@ export const deleteProduct = async(req, res, next) =>{
    } catch (err) {
       res.status(400)
       next(err)
-      
+
    }
 }
 
@@ -136,9 +136,9 @@ export const deleteProduct = async(req, res, next) =>{
     @desc POST update by ID
     @access private
 */
-export const updateProduct = async(req, res, next) => {
+export const updateProduct = async (req, res, next) => {
    try {
-      const { name, description, category, image, countInStock, price} = req.body
+      const { name, description, category, image, countInStock, price } = req.body
       const reqData = {
          name: name,
          description: description,
@@ -148,13 +148,13 @@ export const updateProduct = async(req, res, next) => {
          countInStock: countInStock
       }
 
-      const updatedProductData = await Product.findByIdAndUpdate(req.params.id, reqData, {new: true})
-      if(updatedProductData){
+      const updatedProductData = await Product.findByIdAndUpdate(req.params.id, reqData, { new: true })
+      if (updatedProductData) {
          return res.status(201).json({
             success: true,
             data: updatedProductData
          })
-      }else{
+      } else {
          res.status(401)
          throw Error('update not done correctly')
       }
@@ -171,9 +171,9 @@ export const updateProduct = async(req, res, next) => {
     @access private
 */
 
-export const createProductReview = async(req, res, next) =>{
+export const createProductReview = async (req, res, next) => {
    try {
-      const {rating, comment, name} = req.body
+      const { rating, comment, name } = req.body
       const review = {
          name: name,
          comment: comment,
@@ -181,10 +181,10 @@ export const createProductReview = async(req, res, next) =>{
          product_id: req.params.id
       }
       const product = await Product.findById(req.params.id)
-      if (product){
+      if (product) {
          const reviewData = await Reviews.create(review)
          // const reviewsData = await Reviews.findById(req.params.id)
-         if(reviewData){
+         if (reviewData) {
             // const reviewsData = await Reviews.aggregate([
             //    {
             //       $match: {product_id: mongoose.Types.ObjectId(req.params.id)}
@@ -209,23 +209,23 @@ export const createProductReview = async(req, res, next) =>{
             //    }
             // ])
             const reviewsData = await Reviews.aggregate()
-               .match({product_id: mongoose.Types.ObjectId((req.params.id).toString())})
-               .group({_id: "$product_id", "reviewArr": { $push: "$rating"}})
+               .match({ product_id: mongoose.Types.ObjectId((req.params.id).toString()) })
+               .group({ _id: "$product_id", "reviewArr": { $push: "$rating" } })
                .project({
                   // "countedData": {$count: "$product_id"},
                   "reviewResult": {
                      $reduce: {
                         input: "$reviewArr",
                         initialValue: 0,
-                        in: {$sum: ["$$value", "$$this"]}
+                        in: { $sum: ["$$value", "$$this"] }
                      }
                   }
                })
-            product.numReviews = await Reviews.countDocuments({product_id: req.params.id})
-            product.rating = (Number(reviewsData[0].reviewResult)/ Number(product.numReviews)).toFixed(1)
+            product.numReviews = await Reviews.countDocuments({ product_id: req.params.id })
+            product.rating = (Number(reviewsData[0].reviewResult) / Number(product.numReviews)).toFixed(1)
 
             await product.save()
-            res.status(201).json({ 
+            res.status(201).json({
                message: 'Review added',
                data: product,
                reviewData: reviewData
@@ -235,7 +235,7 @@ export const createProductReview = async(req, res, next) =>{
          //    reviewsData.reduce((acc, rData) => rData.rating + acc, 0) / 
          //    product.numReviews 
          // )
-      }else {
+      } else {
          res.status(404)
          throw new Error('Product not found')
       }
@@ -248,9 +248,9 @@ export const createProductReview = async(req, res, next) =>{
 }
 
 
-export const getTopProduts = async(req, res, next) =>{
+export const getTopProduts = async (req, res, next) => {
    try {
-      const topProducts = await Product.find({}).sort({rating: -1}).limit(4)
+      const topProducts = await Product.find({}).sort({ rating: -1 }).limit(4)
       res.status(201).json({
          success: true,
          count: topProducts.length,
