@@ -10,11 +10,12 @@ const connectDB = async () => {
          // useFindAndModify: false,
          // useCreateIndex: true,
       })
+      // console.log(conn)
       console.log(`💻 ${conn.connection.host} CONNECTED to the DB successfully`)
    } catch (err) {
-       console.log(`Error ${err.message}`)
+      console.log(`Error ${err.message}`)
       process.exit(1)
-      
+
    }
 }
 
