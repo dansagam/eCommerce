@@ -1,9 +1,9 @@
 
 
 
-export const paymentMethods =[
-   'Paypal', 
-   'FlutterWave', 
+export const paymentMethods = [
+   'Paypal',
+   'FlutterWave',
    'Stripe',
    'On Delivery'
 ]
