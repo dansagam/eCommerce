@@ -9,7 +9,7 @@ import generateToken from "../utils/generateToken.js";
     @desc   
     @access public
 */
-export const getUsers = async(req, res, next) => {
+export const getUsers = async (req, res, next) => {
    try {
       const users = await User.find({})
       res.status(201).json({
@@ -20,7 +20,7 @@ export const getUsers = async(req, res, next) => {
    } catch (err) {
       res.status(401)
       next(err)
-      
+
    }
 }
 
@@ -30,15 +30,17 @@ export const getUsers = async(req, res, next) => {
     @desc 
     @access private
 */
-export const deleteUser = async(req, res, next ) => {
+export const deleteUser = async (req, res, next) => {
    try {
       const user = await User.findByIdAndRemove(req.params.id)
 
       return res.status(201).json({
          success: true,
-         message: 'user successfully remove'
+         message: 'user successfully remove',
+         data: user
       })
    } catch (err) {
+      res.status(404)
       next(err)
    }
 }
@@ -50,22 +52,22 @@ export const deleteUser = async(req, res, next ) => {
     @desc 
     @access private
 */
-export const getUserById = async(req, res, next) =>{
+export const getUserById = async (req, res, next) => {
    try {
       const user = await User.findById(req.params.id).select('-password')
-      if (user){
+      if (user) {
          res.status(201).json({
             success: true,
             data: user
          })
-      }else{
+      } else {
          res.status(404)
          throw new Error('User Not found')
       }
    } catch (err) {
       res.status(404)
       next(err)
-      
+
    }
 }
 
@@ -75,9 +77,9 @@ export const getUserById = async(req, res, next) =>{
     @desc 
     @access private/admin
 */
-export const updateUser = async(req, res, next) => {
+export const updateUser = async (req, res, next) => {
    try {
-      const {name, email, isAdmin, password, status} = req.body
+      const { name, email, isAdmin, password, status } = req.body
       const updateUser = {
          name: name,
          email: email,
@@ -85,15 +87,15 @@ export const updateUser = async(req, res, next) => {
          isAdmin: isAdmin,
          password: password
       }
-      const user = await User.findByIdAndUpdate(req.params.id, updateUser, {new: true})
+      const user = await User.findByIdAndUpdate(req.params.id, updateUser, { new: true })
 
-      if(user) {
+      if (user) {
          res.status(201).json({
             success: true,
             data: user
          })
-         
-      }else{
+
+      } else {
          res.status(404)
          throw new Error('User not Found')
       }
@@ -109,11 +111,11 @@ export const updateUser = async(req, res, next) => {
     @desc 
     @access public
 */
-export const loginAuthUser = async(req, res, next) => {
+export const loginAuthUser = async (req, res, next) => {
    try {
-      const { email, password} = req.body
-      const user = await User.findOne({email : email})
-      if( user && (await user.verifyPassword(password))){
+      const { email, password } = req.body
+      const user = await User.findOne({ email: email })
+      if (user && (await user.verifyPassword(password))) {
          return res.status(201).json({
             _id: user._id,
             name: user.name,
@@ -121,7 +123,7 @@ export const loginAuthUser = async(req, res, next) => {
             isAdmin: user.isAdmin,
             token: generateToken(user._id)
          })
-      }else{
+      } else {
          res.status(401)
          throw new Error('Invalid email or password')
       }
@@ -136,11 +138,11 @@ export const loginAuthUser = async(req, res, next) => {
     @desc 
     @access public
 */
-export const registerUser = async(req, res, next) => {
+export const registerUser = async (req, res, next) => {
    try {
-      const {name, email, password} = req.body
+      const { name, email, password } = req.body
 
-      const userExisted = await User.findOne({email: email})
+      const userExisted = await User.findOne({ email: email })
       if (userExisted) {
          res.status(401)
          throw new Error('user already registered')
@@ -158,7 +160,7 @@ export const registerUser = async(req, res, next) => {
             isAdmin: user.isAdmin,
             token: generateToken(user._id)
          })
-      }else{
+      } else {
          res.status(404)
          throw new Error('Invalid User Data')
       }
@@ -173,10 +175,10 @@ export const registerUser = async(req, res, next) => {
     @desc 
     @access public
 */
-export const getUserProfile = async(req, res, next) => {
+export const getUserProfile = async (req, res, next) => {
    try {
       const user = await User.findById(req.params.id)
-      if(user){
+      if (user) {
          res.status(201).json({
             success: true,
             _id: user._id,
@@ -184,7 +186,7 @@ export const getUserProfile = async(req, res, next) => {
             email: user.email,
             isAdmin: user.isAdmin
          })
-      }else{
+      } else {
          res.status(401)
          throw new Error('User not found')
       }
@@ -200,16 +202,16 @@ export const getUserProfile = async(req, res, next) => {
     @desc 
     @access public
 */
-export const updateUserProfile = async(req, res, next) => {
+export const updateUserProfile = async (req, res, next) => {
    try {
-      const {name, email, password} = req.body
+      const { name, email, password } = req.body
       const user = await User.findById(req.params.id)
 
-      if(user) {
+      if (user) {
          user.name = name || user.name
          user.email = email || user.email
-         if(password) {
-            user.password = password 
+         if (password) {
+            user.password = password
          }
          const updatedUser = await user.save()
          return res.status(201).json({
@@ -219,13 +221,13 @@ export const updateUserProfile = async(req, res, next) => {
             email: updatedUser.email,
             token: generateToken(updatedUser._id)
          })
-      }else{
+      } else {
          res.status(401)
          throw new Error('User not Found')
       }
    } catch (err) {
       res.status(404)
       next(err)
-      
+
    }
 }
