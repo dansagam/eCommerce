@@ -35,7 +35,7 @@ function App() {
                   <Route path='/register' component={RegistrationScreen} />
                   <Route path='/profile' component={UserProfileScreen} />
                   <Route path='/product/:id' component={ProductScreen} />
-                  <Route path='/cart/:id?' component={UserCartScreen}  />
+                  <Route path='/cart/:id?' component={UserCartScreen} />
                   <Route path='/admin/productlist' component={ProductListScreen} />
                   <Route path='/admin/productlist/:pageNumber' component={ProductListScreen} />
                   <Route path='/admin/productlist/search/:keyword' component={ProductListScreen} />
@@ -51,7 +51,7 @@ function App() {
                   <Route path='/' component={AppDashboard} exact  >
                      <Redirect to='/dashboard' />
                   </Route>
-                  <Route path='/dashboard' component={AppDashboard}  exact/>
+                  <Route path='/dashboard' component={AppDashboard} exact />
                </Container>
 
             </main>
