@@ -1,7 +1,7 @@
 import express from 'express'
 import path from 'path'
 import { config } from 'dotenv'
-import logger from 'morgan'
+import morgan from 'morgan'
 import connectDB from './config/dB.js'
 import userRoutes from './routes/userRoutes.js'
 import productRoutes from './routes/productRoutes.js'
@@ -21,7 +21,7 @@ const app = express()
 
 
 if (process.env.NODE_ENV === 'development') {
-    app.use(logger('dev'))
+    app.use(morgan('dev'))
 }
 
 app.use(express.json())
