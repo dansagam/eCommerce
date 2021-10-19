@@ -48,7 +48,7 @@ function App() {
                   <Route path='/search/:keyword' component={AppDashboard} exact />
                   <Route path='/page/:pageNumber' component={AppDashboard} exact />
                   <Route path='/search/:keyword/page/:pageNumber' component={AppDashboard} exact />
-                  <Route path='/' component={AppDashboard} exact  >
+                  <Route path='/' exact  >
                      <Redirect to='/dashboard' />
                   </Route>
                   <Route path='/dashboard' component={AppDashboard} exact />
