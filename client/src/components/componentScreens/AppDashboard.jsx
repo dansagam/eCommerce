@@ -2,7 +2,8 @@ import React, { useEffect } from 'react'
 import { Col, Row } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { getProduct } from '../../reduxReducers/productReducers'
+import { getProductLists } from '../../reduxReducers/asyncReducers/productAsyncReducers'
+// import { getProduct } from '../../reduxReducers/productReducers'
 import AppCarousels from '../componentParts/AppCarousels'
 import AppLoader from '../componentParts/AppLoader'
 import Message from '../componentParts/Message'
@@ -15,9 +16,9 @@ const AppDashboard = ({match}) => {
    const keyword = match.params.keyword
    const pageNumber = match.params.pageNumber || 1
    const productList = useSelector(state => state.Product)
-   const { /** products*/ productSearch, page, pages, error, loading} = productList
+   const { /** products*/ products, page, pages, error, loading} = productList
    useEffect(() => {
-      dispatch(getProduct(keyword, pageNumber))
+      dispatch(getProductLists({keyword, pageNumber}))
    },[dispatch, keyword, pageNumber])
    return (
       <>
@@ -37,7 +38,7 @@ const AppDashboard = ({match}) => {
          ) : (
             <>
                <Row>
-                  {productSearch.map((product) => (
+                  {products.map((product) => (
                      <Col key={product._id} sm={12} md={6} lg={4} xl={3}>
                         <Product product={product} />
                      </Col>
