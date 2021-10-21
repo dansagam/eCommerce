@@ -158,7 +158,7 @@ export const getUserProfile = createAsyncThunk('user/getUserProfile',
                Authorization: `Bearer ${userInfo.token}`
             }
          }
-         const { data } = await axios.get(`/api/user/${_id}/profile`, config)
+         const { data } = await axios.get(`/api/users/${_id}/profile`, config)
          return data
       } catch (err) {
          throw new rejectWithValue(err.response)
@@ -186,6 +186,7 @@ export const updateUserProfile = createAsyncThunk('user/updateUserProfile',
             }
          }
          const { data } = await axios.put(`/api/users/${_id}/profile`, userData, config)
+         localStorage.setItem('userInfo', JSON.stringify(data))
          return data
 
       } catch (err) {
