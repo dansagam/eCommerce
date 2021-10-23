@@ -42,10 +42,10 @@ const UserListScreen = ({ history }) => {
                <Table>
                   <thead>
                      <tr>
-                        <td>NAME</td>
-                        <td>EMAIL</td>
-                        <td>ADMIN</td>
-                        <td></td>
+                        <th>NAME</th>
+                        <th>EMAIL</th>
+                        <th>ADMIN</th>
+                        <th></th>
                      </tr>
                   </thead>
                   <tbody>
