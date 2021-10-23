@@ -79,15 +79,14 @@ export const getUserById = async (req, res, next) => {
 */
 export const updateUser = async (req, res, next) => {
    try {
-      const { name, email, isAdmin, password, status } = req.body
+      const { name, email, isAdmin, status } = req.body
       const updateUser = {
          name: name,
          email: email,
          status: status,
          isAdmin: isAdmin,
-         password: password
       }
-      const user = await User.findByIdAndUpdate(req.params.id, updateUser, { new: true })
+      const user = await User.findByIdAndUpdate(req.params.id, updateUser, { new: true }).select('-password')
 
       if (user) {
          res.status(201).json({
