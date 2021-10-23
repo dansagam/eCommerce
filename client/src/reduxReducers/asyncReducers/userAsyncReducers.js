@@ -93,14 +93,13 @@ export const deleteUser = createAsyncThunk('user/deleteUser',
 )
 
 export const updateUser = createAsyncThunk('user/updateUser',
-   async ({ _id, name, email, status, isAdmin, password }, { rejectWithValue, getState }) => {
+   async ({ _id, name, email, status, isAdmin }, { rejectWithValue, getState }) => {
       try {
          const userData = {
             name: name,
             email: email,
             status: status,
             isAdmin: isAdmin,
-            password: password
          }
          const {
             userLogin: {

@@ -24,6 +24,7 @@ export const UserReducers = createSlice({
       },
       isAuthenticated: null,
       isLoading: false,
+      success: false,
       error: {
          msg: null,
          status: null,
@@ -39,6 +40,7 @@ export const UserReducers = createSlice({
             userLogin: {
                userInfo: userInfoFromStorage
             },
+            success: false,
             isAuthenticated: false,
             isLoading: false,
             error: null
@@ -47,7 +49,8 @@ export const UserReducers = createSlice({
       clearErrors: (state, action) => {
          return {
             ...state,
-            error: {}
+            error: null,
+            success: false
          }
       }
    },
@@ -55,27 +58,31 @@ export const UserReducers = createSlice({
       [getUsers.pending]: (state, action) => {
          return {
             ...state,
-            isLoading: true
+            isLoading: true,
+            success: false
          }
       },
       [getUsers.fulfilled]: (state, action) => {
          return {
             ...state,
             isLoading: false,
-            users: action.payload
+            users: action.payload,
+            // success: true
          }
       },
       [getUsers.rejected]: (state, action) => {
          return {
             ...state,
             isLoading: false,
+            success: false,
             error: action.payload.data.message
          }
       },
       [loginUser.pending]: (state, action) => {
          return {
             ...state,
-            isLoading: true
+            isLoading: true,
+            success: false
          }
 
       },
@@ -84,6 +91,7 @@ export const UserReducers = createSlice({
             ...state,
             ...action.payload,
             isAuthenticated: true,
+            // success: true,
             userLogin: {
                userInfo: action.payload
             }
@@ -93,6 +101,7 @@ export const UserReducers = createSlice({
       [loginUser.rejected]: (state, action) => {
          return {
             ...state,
+            success: false,
             isLoading: false,
             isAuthenticated: false,
             userLogin: {
@@ -109,13 +118,15 @@ export const UserReducers = createSlice({
       [registerUser.pending]: (state, action) => {
          return {
             ...state,
-            isLoading: true
+            isLoading: true,
+            success: false
          }
       },
       [registerUser.fulfilled]: (state, action) => {
          return {
             ...state,
             ...action.payload,
+            // success: true,
             users: [action.payload, ...state.users],
             isAuthenticated: true,
             userLogin: {
@@ -127,6 +138,7 @@ export const UserReducers = createSlice({
          return {
             ...state,
             isLoading: false,
+            success: false,
             isAuthenticated: false,
             userLogin: {
                userInfo: null
@@ -137,13 +149,15 @@ export const UserReducers = createSlice({
       [deleteUser.pending]: (state, action) => {
          return {
             ...state,
-            isLoading: true
+            isLoading: true,
+            success: false
          }
       },
       [deleteUser.fulfilled]: (state, action) => {
          return {
             ...state,
             isLoading: false,
+            // success: true,
             users: state.users.filter(user => user._id !== action.payload)
          }
       },
@@ -151,29 +165,37 @@ export const UserReducers = createSlice({
          return {
             ...state,
             isLoading: false,
-            error: action.payload.data.message
+            error: action.payload.data.message,
+            success: false
          }
       },
       [updateUser.pending]: (state, action) => {
          return {
             ...state,
-            isLoading: true
+            isLoading: true,
+            success: false
          }
       },
       [updateUser.fulfilled]: (state, action) => {
-         const { _id, email, name, isAdmin, status } = action.payload
-         const existingUser = state.users.find(user => user._id === _id)
-         if (existingUser) {
-            existingUser.isAdmin = isAdmin
-            existingUser.email = email
-            existingUser.name = name
-            existingUser.status = status
+         // const { _id, email, name, isAdmin, status } = action.payload
+         // const existingUser = state.users.find(user => user._id === _id)
+         // if (existingUser) {
+         //    existingUser.isAdmin = isAdmin
+         //    existingUser.email = email
+         //    existingUser.name = name
+         //    existingUser.status = status
+         // }
+         return {
+            ...state,
+            success: true,
+            user: action.payload
          }
       },
       [updateUser.rejected]: (state, action) => {
          return {
             ...state,
             isLoading: false,
+            success: false,
             error: action.payload.data.message
          }
       },
@@ -181,6 +203,7 @@ export const UserReducers = createSlice({
          return {
             ...state,
             isLoading: false,
+            success: false
          }
       },
       [updateUserProfile.fulfilled]: (state, action) => {
@@ -192,11 +215,17 @@ export const UserReducers = createSlice({
             existingUser.name = name
             existingUser.status = status
          }
+         return {
+            ...state,
+            success: true,
+            user: action.payload
+         }
       },
       [getUserById.pending]: (state, action) => {
          return {
             ...state,
-            isLoading: true
+            isLoading: true,
+            success: false
          }
 
       },
@@ -204,33 +233,38 @@ export const UserReducers = createSlice({
          return {
             ...state,
             isLoading: false,
-            user: action.payload
+            user: action.payload,
+            // success: true
          }
       },
       [getUserById.rejected]: (state, action) => {
          return {
             ...state,
             isLoading: false,
-            error: action.payload.data.message
+            error: action.payload.data.message,
+            success: false
          }
       },
       [getUserProfile.pending]: (state, action) => {
          return {
             ...state,
-            isLoading: true
+            isLoading: true,
+            success: false
          }
       },
       [getUserProfile.fulfilled]: (state, action) => {
          return {
             ...state,
             isLoading: false,
-            user: action.payload
+            user: action.payload,
+            // success: true
          }
       },
       [getUserProfile.rejected]: (state, action) => {
          return {
             ...state,
             isLoading: false,
+            success: false,
             error: action.payload.data.message
          }
 
