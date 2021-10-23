@@ -11,7 +11,7 @@ import Message from '../componentParts/Message'
 const UserListScreen = ({ history }) => {
    const [msg, setMsg] = useState('')
    const {
-      error, loading, users, userLogin: {
+      error, isLoading, users, userLogin: {
          userInfo
       }
    } = useSelector(state => state.User)
@@ -37,7 +37,7 @@ const UserListScreen = ({ history }) => {
       <>
          <h1>User List</h1>
          {msg ? <Message variant='danger'>{`${msg}`}</Message> : ''}
-         {loading ? (<AppLoader />)
+         {isLoading ? (<AppLoader />)
             : (
                <Table>
                   <thead>

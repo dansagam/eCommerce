@@ -10,7 +10,7 @@ import {
 
 const UserProfileScreen = ({ location, history }) => {
    const { userInfo } = useSelector(state => state.User.userLogin)
-   const { error, loading, user } = useSelector(state => state.User)
+   const { error, isLoading, user } = useSelector(state => state.User)
    const dispatch = useDispatch()
    const [name, setName] = useState('')
    const [email, setEmail] = useState('')
@@ -55,7 +55,7 @@ const UserProfileScreen = ({ location, history }) => {
             <h1>User Profile</h1>
             {message ? <Message variant='danger'>{`${message}`}</Message> : ''}
             {msg ? <Message variant='danger'>{`${msg}`}</Message> : ''}
-            {loading ? <AppLoader />
+            {isLoading ? <AppLoader />
                : (<Form onSubmit={onSubmitHandler}>
                   <FloatingLabel label='Full Name'>
                      <Form.Control
@@ -94,8 +94,8 @@ const UserProfileScreen = ({ location, history }) => {
                      />
                   </FloatingLabel>
                   <Button type='submit'>Update Profile</Button>
-               </Form>
-               )}
+               </Form>)
+            }
 
          </Col>
       </Row>

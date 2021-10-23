@@ -14,7 +14,7 @@ const UserEditScreen = ({ match, history }) => {
    const [email, setEmail] = useState('')
    const [isAdmin, setIsAdmin] = useState('')
    const [statusBar, setStatusBar] = useState('')
-   const { loading, error, user, success } = useSelector(state => state.User)
+   const { isLoading, error, user, success } = useSelector(state => state.User)
    useEffect(() => {
       setMsg(error.msg)
       if (success) {
@@ -47,7 +47,7 @@ const UserEditScreen = ({ match, history }) => {
    return (
       <FormHousing>
          {msg ? <Message variant='danger'>{msg}</Message> : ''}
-         {loading ? <AppLoader /> : (
+         {isLoading ? <AppLoader /> : (
             <Form onSubmit={onSubmitHandler}>
                <FloatingLabel label='Full Name'>
                   <Form.Control
