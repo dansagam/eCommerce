@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import { useState } from 'react'
 import { Col, Row } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
@@ -11,21 +12,23 @@ import MetaData from '../componentParts/MetaData'
 import PaginationContainer from '../componentParts/PaginationContainer'
 import Product from '../componentParts/Product'
 
-const AppDashboard = ({match}) => {
+const AppDashboard = ({ match }) => {
    const dispatch = useDispatch()
    const keyword = match.params.keyword
    const pageNumber = match.params.pageNumber || 1
    const productList = useSelector(state => state.Product)
-   const { /** products*/ products, page, pages, error, loading} = productList
+   const [msg, setMsg] = useState('')
+   const { products, page, pages, error, loading } = productList
    useEffect(() => {
-      dispatch(getProductLists({keyword, pageNumber}))
-   },[dispatch, keyword, pageNumber])
+      setMsg(error.msg)
+      dispatch(getProductLists({ keyword, pageNumber }))
+   }, [dispatch, keyword, pageNumber, error])
    return (
       <>
          <MetaData />
          {!keyword ? (
             <AppCarousels />
-         ) :(
+         ) : (
             <Link to='/' className='btn btn-light'>
                Go Back
             </Link>
@@ -33,8 +36,8 @@ const AppDashboard = ({match}) => {
          <h1>Latest Products</h1>
          {loading ? (
             <AppLoader />
-         ): error ? (
-            <Message variant='danger'>{error}</Message>
+         ) : msg ? (
+            <Message variant='danger'>{`${msg}`}</Message>
          ) : (
             <>
                <Row>
@@ -44,9 +47,9 @@ const AppDashboard = ({match}) => {
                      </Col>
                   ))}
                </Row>
-               <PaginationContainer 
+               <PaginationContainer
                   pages={pages}
-                  page= {page}
+                  page={page}
                   keyword={keyword ? keyword : ''}
                />
             </>
