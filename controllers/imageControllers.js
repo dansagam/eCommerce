@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import fs from 'fs'
 // import connectDB from "../config/dB.js";
 import Grid from 'gridfs-stream'
 import { config } from 'dotenv'
@@ -13,7 +14,7 @@ let gfs
 // connectDB()
 conn.once('open', function () {
    // gfs = new mongoose.mongo.GridFSBucket(conn.db, { bucketName: 'productimages' })
-   gfs = Grid(conn.db)
+   gfs = new Grid(conn.db)
    gfs.collection('productimages')
 
 })
@@ -33,9 +34,14 @@ export const getImage = async (req, res, next) => {
       const image = await gfs.files.findOne({
          filename: req.params.imageName
       })
-      let readStream = gfs.createReadStream({ filename: image.filename })
+      // console.log(image)
+      // let readStream = gfs.createReadStream(`${image.filename}`)
+      let readStream = gfs.createReadStream(image.filename)
+      // let readStream = gfs.createReadStream()
+      // const readStream = gfs.openDownloadStreamByName(req.params.imageName)
+      // const readStream = fs.openDownloadStreamByName(req.params.imageName)
       readStream.pipe(res)
-      res.send({ image: image });
+      // res.send({ image: image });
    } catch (err) {
       res.status(401)
       next(err)

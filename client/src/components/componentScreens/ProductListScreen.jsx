@@ -26,6 +26,9 @@ const ProductListScreen = ({ history, match }) => {
          dispatch(getProductLists({ keyword: '', pageNumber: pageNumber }))
       }
    }, [error, userInfo, history, dispatch, pageNumber])
+   const onClickPlus = () => {
+      history.push('/admin/product/create')
+   }
    return (
       <>
          <Row className='align-items-center'>
@@ -33,7 +36,7 @@ const ProductListScreen = ({ history, match }) => {
                <h1>Products</h1>
             </Col>
             <Col>
-               <Button onClick={''}>
+               <Button onClick={onClickPlus}>
                   <FontAwesomeIcon icon={faPlus} />
                </Button>
             </Col>

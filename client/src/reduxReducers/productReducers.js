@@ -19,30 +19,18 @@ export const ProductReducers = createSlice({
       },
       loading: false,
       status: false,
-      error: null,
+      // error: null,
       page: null,
-      pages: null
-      // productSearch: [
-      //    {
-      //       _id: null,
-      //       name: '',
-      //       image: '',
-      //       price: null,
-      //       description: '',
-      //       numReviews: null,
-      //       rating: null,
-      //       reviews: [
-      //       ],
-      //       stockInCount: null
-
-      //    },
-
-      // ],
-      // error: {
-      //    msg: undefined,
-      //    status: null,
-      //    id: null
-      // },
+      pages: null,
+      updateSuccess: false,
+      createSuccess: false,
+      deleteSuccess: false,
+      reviewCreateSuccess: false,
+      error: {
+         msg: '',
+         status: null,
+         id: null
+      },
    },
    reducers: {
       getProduct: {
@@ -135,12 +123,12 @@ export const ProductReducers = createSlice({
             ...state,
             loading: false,
             status: false,
-            // error: {
-            //    msg: action.payload.data.message,
-            //    status: action.payload.status,
-            //    id: action.payload.statusText
-            // }
-            error: action.payload.data.message
+            error: {
+               msg: action.payload.data.message,
+               status: action.payload.status,
+               id: action.payload.statusText
+            }
+            // error: action.payload.data.message
          }
       },
       [getProductById.pending]: (state, action) => {
@@ -158,16 +146,17 @@ export const ProductReducers = createSlice({
          }
       },
       [getProductById.rejected]: (state, action) => {
+         console.log(action.payload)
          return {
             ...state,
             loading: false,
             status: false,
-            // error: {
-            //    msg: action.payload.data.message,
-            //    status: action.payload.status,
-            //    id: action.payload.statusText
-            // }
-            error: action.payload.data.message
+            error: {
+               msg: action.payload.data.message,
+               status: action.payload.status,
+               id: action.payload.statusText
+            }
+            // error: action.payload.data.message
          }
       },
       [getTopRatedProduct.pending]: (state, action) => {
@@ -188,25 +177,28 @@ export const ProductReducers = createSlice({
             ...state,
             loading: false,
             status: false,
-            // error: {
-            //    msg: action.payload.data.message,
-            //    status: action.payload.status,
-            //    id: action.payload.statusText
-            // }
-            error: action.payload.data.message
+            error: {
+               msg: action.payload.data.message,
+               status: action.payload.status,
+               id: action.payload.statusText
+            }
+            // error: action.payload.data.message
          }
       },
       [createNewProduct.pending]: (state, action) => {
          return {
             ...state,
-            loading: true
+            loading: true,
+            createSuccess: false
          }
       },
       [createNewProduct.fulfilled]: (state, action) => {
          return {
             ...state,
             loading: false,
-            products: [action.payload, ...state.products]
+            products: [action.payload, ...state.products],
+            product: action.payload,
+            createSuccess: true
          }
       },
       [createNewProduct.rejected]: (state, action) => {
@@ -214,25 +206,28 @@ export const ProductReducers = createSlice({
             ...state,
             loading: false,
             status: false,
-            // error: {
-            //    msg: action.payload.data.message,
-            //    status: action.payload.status,
-            //    id: action.payload.statusText
-            // }
-            error: action.payload.data.message
+            createSuccess: false,
+            error: {
+               msg: action.payload.data.message,
+               status: action.payload.status,
+               id: action.payload.statusText
+            }
+            // error: action.payload.data.message
          }
       },
       [deleteProduct.pending]: (state, action) => {
          return {
             ...state,
-            loading: true
+            loading: true,
+            deleteSuccess: false
          }
       },
       [deleteProduct.fulfilled]: (state, action) => {
          return {
             ...state,
             loading: false,
-            products: state.products.filter(product => product._id !== action.payload)
+            products: state.products.filter(product => product._id !== action.payload),
+            deleteSuccess: true
          }
       },
       [deleteProduct.rejected]: (state, action) => {
@@ -240,18 +235,20 @@ export const ProductReducers = createSlice({
             ...state,
             loading: false,
             status: false,
-            // error: {
-            //    msg: action.payload.data.message,
-            //    status: action.payload.status,
-            //    id: action.payload.statusText
-            // }
-            error: action.payload.data.message
+            deleteSuccess: false,
+            error: {
+               msg: action.payload.data.message,
+               status: action.payload.status,
+               id: action.payload.statusText
+            }
+            // error: action.payload.data.message
          }
       },
       [updateProduct.pending]: (state, action) => {
          return {
             ...state,
-            loading: true
+            loading: true,
+            updateSuccess: false
          }
       },
       [updateProduct.fulfilled]: (state, action) => {
@@ -265,18 +262,25 @@ export const ProductReducers = createSlice({
             existingProduct.category = category
             existingProduct.countInStock = countInStock
          }
+         return {
+            ...state,
+            loading: false,
+            updateSuccess: true,
+            product: action.payload
+         }
       },
       [updateProduct.rejected]: (state, action) => {
          return {
             ...state,
             loading: false,
             status: false,
-            // error: {
-            //    msg: action.payload.data.message,
-            //    status: action.payload.status,
-            //    id: action.payload.statusText
-            // }
-            error: action.payload.data.message
+            updateSuccess: false,
+            error: {
+               msg: action.payload.data.message,
+               status: action.payload.status,
+               id: action.payload.statusText
+            }
+            // error: action.payload.data.message
          }
       }
    }

@@ -19,6 +19,7 @@ import ProductScreen from './components/componentScreens/ProductScreen';
 import UserCartScreen from './components/componentScreens/UserCartScreen';
 import AppHeader from './components/componentParts/AppHeader';
 import AppFooter from './components/componentParts/AppFooter';
+import ProductCreateScreen from './components/componentScreens/ProductCreateScreen';
 
 function App() {
    return (
@@ -39,6 +40,7 @@ function App() {
                   <Route path='/admin/productlist' component={ProductListScreen} />
                   <Route path='/admin/productlist/:pageNumber' component={ProductListScreen} />
                   <Route path='/admin/productlist/search/:keyword' component={ProductListScreen} />
+                  <Route path='/admin/product/create' component={ProductCreateScreen} />
                   <Route path='/admin/product/:id/edit' component={ProductEditScreen} />
                   <Route path='/admin/orderlist' component={OrderListScreen} />
                   <Route path='/admin/userlist' component={UserListScreen} />
