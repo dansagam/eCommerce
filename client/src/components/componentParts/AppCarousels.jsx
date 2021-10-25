@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import { useState } from 'react'
 import { Image, Carousel } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
@@ -9,15 +10,17 @@ import Message from './Message'
 const AppCarousels = () => {
    const dispatch = useDispatch()
    const productList = useSelector(state => state.Product)
+   const [msg, setMsg] = useState('')
    const { loading, error, topProducts } = productList
 
    useEffect(() => {
+      setMsg(error.msg)
       dispatch(getTopRatedProduct())
-   }, [dispatch])
+   }, [dispatch, error])
    return loading ? (
       <AppLoader />
-   ) : error ? (
-      <Message variant='danger' >{error}</Message>
+   ) : msg ? (
+      <Message variant='danger' >{`${msg}`}</Message>
    ) : (
       <>
          <Carousel pause='hover' className='bg-dark carousel' fade>
