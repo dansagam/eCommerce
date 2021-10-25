@@ -16,7 +16,11 @@ const ProductScreen = ({ history, match }) => {
    const [comment, setComment] = useState('')
    const [msg, setMsg] = useState('')
 
-
+   const {
+      userLogin: {
+         userInfo
+      }
+   } = useSelector(state => state.User)
    const { loading, error, product, reviewCreateSuccess } = useSelector(state => state.Product)
 
    useEffect(() => {
@@ -126,61 +130,72 @@ const ProductScreen = ({ history, match }) => {
                   <Row>
                      <Col md={6}>
                         <h2>Reviews</h2>
-                        {product.reviews.length === 0 && <Message variant='danger'>No Reviews done so far</Message>}
-                        <ListGroup>
+                        {
+                           product.reviews.length === 0 &&
+                           <Message variant='danger'>
+                              No Reviews done so far
+                           </Message>
+                        }
+                        <ListGroup variant='flush'>
                            {product.reviews.map(review => (
                               <ListGroup.Item key={review._id}>
                                  <strong>{review.name}</strong>
                                  <Ratings value={review.rating} />
+                                 <p>{review.createdAt.substring(0, 10)}</p>
                                  <strong>{review.comment}</strong>
                               </ListGroup.Item>
                            ))}
                            <ListGroup.Item>
+                              <h2>Write a Customer Review</h2>
+                              {reviewCreateSuccess &&
+                                 <Message variant='success'>
+                                    Review successfully submitted
+                                 </Message>
+                              }
+                              {loading && <AppLoader />}
                               {msg && (<Message variant='danger'>{`${msg}`}</Message>)}
-                              <Form onSubmit={submitHandler}>
-                                 <FloatingLabel
-                                    controlId="floatingInputRatings"
-                                    label='Ratings'
-                                 >
-                                    <Form.Select
-                                       value={rating}
-                                       onChange={(e) => setRating(e.target.value)}
+                              {userInfo ?
+                                 (<Form onSubmit={submitHandler}>
+                                    <FloatingLabel
+                                       controlId="floatingInputRatings"
+                                       label='Ratings'
                                     >
-                                       <option value=''>Select...</option>
-                                       <option value='1'>1 - Poor</option>
-                                       <option value='2'>2 - Fair</option>
-                                       <option value='3'>3 - Good</option>
-                                       <option value='4'>4 - Very Good</option>
-                                       <option value='5'>5 - Excellent</option>
-                                    </Form.Select>
-                                 </FloatingLabel>
+                                       <Form.Select
+                                          value={rating}
+                                          onChange={(e) => setRating(e.target.value)}
+                                       >
+                                          <option value=''>Select...</option>
+                                          <option value='1'>1 - Poor</option>
+                                          <option value='2'>2 - Fair</option>
+                                          <option value='3'>3 - Good</option>
+                                          <option value='4'>4 - Very Good</option>
+                                          <option value='5'>5 - Excellent</option>
+                                       </Form.Select>
+                                    </FloatingLabel>
 
-                                 <FloatingLabel
-                                    controlId='floatingInputComment'
-                                    label='Comment'
-                                 >
-                                    <Form.Control
-                                       type='textarea'
-                                       value={comment}
-                                       onChange={(e) => setComment(e.target.value)}
+                                    <FloatingLabel
+                                       controlId='floatingInputComment'
+                                       label='Comment'
+                                    >
+                                       <Form.Control
+                                          type='textarea'
+                                          value={comment}
+                                          onChange={(e) => setComment(e.target.value)}
 
-                                    />
-                                 </FloatingLabel>
-                                 <Button type='submit' variant='primary'>Submit</Button>
-                              </Form>
-
-
-
-                              <Message>
-                                 Please <Link to='/login'>sign in</Link> to write a review{' '}
-                              </Message>
+                                       />
+                                    </FloatingLabel>
+                                    <Button type='submit' variant='primary'>Submit</Button>
+                                 </Form>)
+                                 : (<Message>
+                                    Please <Link to='/login'>sign in</Link> to write a review{' '}
+                                 </Message>)
+                              }
                            </ListGroup.Item>
                         </ListGroup>
                      </Col>
                   </Row>
                </>
             )
-
          }
       </>
    )
