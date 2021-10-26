@@ -1,31 +1,32 @@
+/* eslint-disable no-unused-vars */
 import React from 'react'
 import { Button, Card, Col, Form, Image, ListGroup, Row } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import Message from '../componentParts/Message'
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import {faTrash} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
 
-const UserCartScreen = ({match, location, history}) => {
+const UserCartScreen = ({ match, location, history }) => {
    const productItemId = match.params.id
    const qty = location.search ? Number(location.search.split('=')[1]) : 1
 
    const dispatch = useDispatch()
    const cart = useSelector(state => state.Cart)
-   const { cartItems} = cart
-   const checkoutHandler = () =>{
+   const { cartItems } = cart
+   const checkoutHandler = () => {
       // history.push('/login?redirect=shipping')
       history.push('/shipping')
    }
 
    return (
       <div>
-      <h2>testing microphone </h2>
-      <Row >
-         <Col md={8}>
-            <h1>Shipping Cart</h1>
-            {cartItems.length === 0 ?(<Message>Your Cart is Empty <Link to='/'>Go Back</Link></Message>) 
-               :  <ListGroup variant='flush'>
+         <h2>testing microphone </h2>
+         <Row >
+            <Col md={8}>
+               <h1>Shipping Cart</h1>
+               {cartItems.length === 0 ? (<Message>Your Cart is Empty <Link to='/'>Go Back</Link></Message>)
+                  : <ListGroup variant='flush'>
                      {cartItems.map((item) => (
                         <ListGroup.Item key={item.productId}>
                            {console.log(item)}
@@ -41,8 +42,8 @@ const UserCartScreen = ({match, location, history}) => {
                                  <Form.Select
                                     value={item.qty}
                                  >
-                                    {[...Array(item.productStockCount).keys()].map((x) =>(
-                                       <option key={x+1} value={x + 1}>
+                                    {[...Array(item.productStockCount).keys()].map((x) => (
+                                       <option key={x + 1} value={x + 1}>
                                           {x + 1}
                                        </option>
                                     ))}
@@ -58,29 +59,29 @@ const UserCartScreen = ({match, location, history}) => {
                      ))}
                      <h1>testing</h1>
                   </ListGroup>
-            }
-         </Col>
-         <Col md={4}>
-            <Card>
-               <ListGroup variant='flush'>
-                  <ListGroup.Item>
-                     <h2>Subtotal: ({cartItems.reduce((acc, item) => acc + item.qty, 0)}) items</h2>
-                     ₦ {cartItems.reduce((acc, item) => acc + item.qty * item.productPrice, 0).toFixed(2)}
-                  </ListGroup.Item>
-                  <ListGroup.Item>
-                     <Button
-                        className='btn-block'
-                        disabled={cartItems.length === 0}
-                        onClick={checkoutHandler}
-                     >
-                        Proceed to Checkout
-                     </Button>
-                  </ListGroup.Item>
-               </ListGroup>
-            </Card>
-         </Col>
-      </Row>
-         
+               }
+            </Col>
+            <Col md={4}>
+               <Card>
+                  <ListGroup variant='flush'>
+                     <ListGroup.Item>
+                        <h2>Subtotal: ({cartItems.reduce((acc, item) => acc + item.qty, 0)}) items</h2>
+                        ₦ {cartItems.reduce((acc, item) => acc + item.qty * item.productPrice, 0).toFixed(2)}
+                     </ListGroup.Item>
+                     <ListGroup.Item>
+                        <Button
+                           className='btn-block'
+                           disabled={cartItems.length === 0}
+                           onClick={checkoutHandler}
+                        >
+                           Proceed to Checkout
+                        </Button>
+                     </ListGroup.Item>
+                  </ListGroup>
+               </Card>
+            </Col>
+         </Row>
+
       </div>
    )
 }
