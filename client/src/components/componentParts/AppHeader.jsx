@@ -5,17 +5,19 @@ import { LinkContainer } from 'react-router-bootstrap'
 import logo from '../../images/eShoping.svg'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUser, faCartPlus } from '@fortawesome/free-solid-svg-icons'
-import { Route } from 'react-router'
+import { Route, useHistory } from 'react-router'
 import SearchContainer from './SearchContainer'
 import { logoutSuccess } from '../../reduxReducers/userReducers'
 
 const AppHeader = () => {
+   const histon = useHistory()
    const dispatch = useDispatch()
    const { isAuthenticated } = useSelector(state => state.User)
    const { userInfo } = useSelector(state => state.User.userLogin)
 
    const logoutHandler = () => {
       dispatch(logoutSuccess())
+      histon.push('/')
    }
 
    const profileLink = (
