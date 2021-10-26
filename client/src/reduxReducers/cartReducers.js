@@ -1,20 +1,17 @@
 import { createSlice } from "@reduxjs/toolkit"
 
+const cartItemsFromStorage = localStorage.getItem('cartItems')
+   ? JSON.parse(localStorage.getItem('cartItems')) : []
+
+const shippingAddressFromStorage = localStorage.getItem('shippingAddress')
+   ? JSON.parse(localStorage.getItem('shippingAddress'))
+   : {}
 
 export const CartReducers = createSlice({
    name: 'cart',
    initialState: {
-      cartItems: [
-         {
-            productId: null,
-            productName: 'ehksjhdj',
-            productImage: '/images/playstation.jpg',
-            productPrice: 4000,
-            productStockCount: 5,
-            qty: 0
-         }
-      ],
-      shippingAddress: {},
+      cartItems: cartItemsFromStorage,
+      shippingAddress: shippingAddressFromStorage,
       itemsPrice: 0,
       shippingPrice: 0,
       taxPrice: 0,
