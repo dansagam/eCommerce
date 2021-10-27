@@ -2,9 +2,31 @@ import mongoose from 'mongoose'
 import CartItem from '../models/cartItemModel.js'
 import Cart from '../models/cartModel.js'
 import Order from '../models/orderModel.js'
+import Product from '../models/productModel.js'
 import ShippingAddress from '../models/shippingAddressModel.js'
 
 
+
+
+export const getCartByUserId = async (req, res, next) => {
+   try {
+      const cart = await Cart.findOne({ user: req.user._id })
+         .populate({ path: 'cartItems', populate: { path: 'product' } })
+      if (cart) {
+         res.status(201).json({
+            success: true,
+            data: cart
+         })
+      } else {
+         res.status(404)
+         throw new Error('Cart not found for users')
+      }
+   } catch (err) {
+      res.status(404)
+      next(err)
+
+   }
+}
 
 /*
     @route  api/cart/:id
@@ -13,7 +35,8 @@ import ShippingAddress from '../models/shippingAddressModel.js'
 */
 export const getCartById = async (req, res, next) => {
    try {
-      const cart = await Cart.findById(req.params.id).populate('cartItems')
+      const cart = await Cart.findById(req.params.id)
+         .populate({ path: 'cartItems', populate: { path: 'product' } })
       if (cart) {
          res.status(201).json({
             success: true,
@@ -43,25 +66,44 @@ export const addCartItems = async (req, res, next) => {
       const {
          product_id, qty, price
       } = req.body
-      const existingCart = await Cart.findOne({ user: req.user._id }).populate('cartItems')
+      const existingCart = await Cart.findOne({ user: req.user._id })
+         .populate({ path: 'cartItems' })
       if (existingCart && existingCart.length !== 0) {
-         const cartItem = await CartItem.create({
-            product: product_id,
-            qty: qty,
-            price: price
-         })
-         if (cartItem) {
-            existingCart.cartItems.push(cartItem)
-            existingCart.totalPrice = existingCart.cartItems.reduce((acc, item) =>
-               (item.price * item.qty) + acc, 0)
-            const updatedCart = await Cart.findByIdAndUpdate(existingCart._id, existingCart, { new: true })
-            res.status(201).json({
-               success: true,
-               data: updatedCart
-            })
+         const foundProduct = await Product.findById(product_id)
+         const foundExistingProductItem = existingCart.cartItems.find(cartIT =>
+            cartIT.product.equals(foundProduct._id))
+         // console.log(foundExistingProductItem)
+         if (foundExistingProductItem) {
+            const cartItem = await CartItem.findByIdAndUpdate(foundExistingProductItem._id,
+               { qty: qty }, { new: true })
+            if (cartItem) {
+               const updatedCart = await Cart.findById(existingCart._id)
+                  .populate({ path: 'cartItems', populate: { path: 'product' } })
+               res.status(201).json({
+                  success: true,
+                  data: updatedCart
+               })
+            }
          } else {
-            res.status(401)
-            throw new Error('Item not added successfully')
+            const cartItem = await CartItem.create({
+               product: product_id,
+               qty: qty,
+               price: price
+            })
+            if (cartItem) {
+               existingCart.cartItems.push(cartItem)
+               existingCart.totalPrice = existingCart.cartItems.reduce((acc, item) =>
+                  (item.price * item.qty) + acc, 0)
+               const updatedCart = await Cart.findByIdAndUpdate(existingCart._id, existingCart,
+                  { new: true }).populate({ path: 'cartItems', populate: { path: 'product' } })
+               res.status(201).json({
+                  success: true,
+                  data: updatedCart
+               })
+            } else {
+               res.status(401)
+               throw new Error('Item not added successfully')
+            }
          }
       } else {
          const cartItem = await CartItem.create({
@@ -107,12 +149,15 @@ export const deleteCartItem = async (req, res, next) => {
          if (foundCartItem) {
             // goddy = foundCart.cartItems.filter(item => item !== foundCartItem._id)
             foundCart.cartItems.splice(foundCart.cartItems.indexOf(foundCartItem._id), 1)
-            console.log(foundCart, foundCartItem._id)
-            const updatedCart = await Cart.findByIdAndUpdate(foundCart._id, foundCart, { new: true })
+            // console.log(foundCart, foundCartItem._id)
+            const updatedCart = await Cart.findByIdAndUpdate(foundCart._id, foundCart,
+               { new: true }
+            ).populate({ path: 'cartItems', populate: { path: 'product' } })
             const deletedItem = await CartItem.findByIdAndRemove(req.params.itemId)
             res.status(201).json({
                success: true,
-               data: updatedCart
+               data: updatedCart,
+               deletedData: deletedItem
             })
          } else {
             res.status(404)
@@ -153,21 +198,20 @@ export const updateCartShippingAddress = async (req, res, next) => {
                postalCode: postalCode
             }
          }
-
          const shippingAddress = await ShippingAddress.create(newShippingAddress)
          if (shippingAddress) {
             cart.shippingAddress = shippingAddress._id
-            await cart.save()
+            const updateCartShipping = await
+               Cart.findByIdAndUpdate(cart._id, cart, { new: true }
+               ).populate({ path: 'cartItems', populate: { path: 'product' } }).populate('shippingAddress')
             res.status(201).json({
                success: true,
-               data: cart
+               data: updateCartShipping
             })
-
          } else {
             res.status(401)
             throw new Error('shipping address not added')
          }
-
       } else {
          res.status(404)
          throw new Error('Cart cannot be found')
@@ -175,7 +219,6 @@ export const updateCartShippingAddress = async (req, res, next) => {
    } catch (err) {
       res.status(404)
       next(err)
-
    }
 }
 
@@ -184,7 +227,7 @@ export const updateCartDeliveryMode = async (req, res, next) => {
       const { deliveryMode } = req.body
       const foundCart = await Cart.findByIdAndUpdate(req.params.id,
          { deliveryMode: deliveryMode }, { new: true }
-      )
+      ).populate({ path: 'cartItems', populate: { path: 'product' } })
       if (foundCart) {
          res.status(201).json({
             success: true,
@@ -206,7 +249,9 @@ export const updateCartDeliveryMode = async (req, res, next) => {
 export const updateCartItem = async (req, res, next) => {
    try {
       const { qty, } = req.body
-      const updatedCartItem = await CartItem.findByIdAndUpdate(req.params.itemId, { qty: qty }, { new: true })
+      const updatedCartItem = await CartItem.findByIdAndUpdate(req.params.itemId,
+         { qty: qty }, { new: true }
+      ).populate({ path: 'cartItems', populate: { path: 'product' } })
       if (updatedCartItem) {
          res.status(201).json({
             success: true,
@@ -240,7 +285,7 @@ export const updateCartToPaid = async (req, res, next) => {
          if (updatedCart) {
             const recentCart = await Cart.findByIdAndUpdate(req.params.id,
                { status: "inactive" }, { new: true }
-            )
+            ).populate({ path: 'cartItems', populate: { path: 'product' } })
             if (recentCart) {
                const newCreatedOrder = await Order.create({
                   user: req.user._id,
