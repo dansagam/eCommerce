@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Button, Card, Col, Form, Image, ListGroup, Row, FloatingLabel } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
+import { addNewCart } from '../../reduxReducers/asyncReducers/cartAsyncReducers'
 import { getProductById } from '../../reduxReducers/asyncReducers/productAsyncReducers'
 import { /**getProductDetailsById*/ itemReviewCreation } from '../../reduxReducers/productReducers'
 import AppLoader from '../componentParts/AppLoader'
@@ -11,7 +12,7 @@ import Ratings from '../componentParts/Ratings'
 
 const ProductScreen = ({ history, match }) => {
    const dispatch = useDispatch()
-   const [qty, setQty] = useState(0)
+   const [qty, setQty] = useState(1)
    const [rating, setRating] = useState(0)
    const [comment, setComment] = useState('')
    const [msg, setMsg] = useState('')
@@ -21,6 +22,7 @@ const ProductScreen = ({ history, match }) => {
          userInfo
       }
    } = useSelector(state => state.User)
+   const { cart, addCartSuccess } = useSelector(state => state.Cart)
    const { loading, error, product, reviewCreateSuccess } = useSelector(state => state.Product)
 
    useEffect(() => {
@@ -29,11 +31,14 @@ const ProductScreen = ({ history, match }) => {
          setRating(0)
          setComment('')
       }
+      if (addCartSuccess) {
+         history.push(`/cart/${cart._id}?qty=${qty}`)
+      }
       if (!product._id || product._id !== match.params.id) {
 
          dispatch(getProductById({ _id: match.params.id }))
       }
-   }, [dispatch, match, product, reviewCreateSuccess, error])
+   }, [dispatch, match, history, cart, qty, product, addCartSuccess, reviewCreateSuccess, error])
 
    const submitHandler = (e) => {
       e.preventDefault()
@@ -41,7 +46,12 @@ const ProductScreen = ({ history, match }) => {
       // dispatch(getProductDetailsById(match.params.id))
    }
    const addToCartHandler = () => {
-      history.push(`/cart/${match.params.id}?qty=${qty}`)
+      dispatch(addNewCart({
+         product_id: product._id,
+         qty: qty,
+         price: product.price
+
+      }))
    }
    return (
       <>
@@ -87,11 +97,11 @@ const ProductScreen = ({ history, match }) => {
                                  <Row>
                                     <Col>Status:</Col>
                                     <Col>
-                                       {product.stockInCount > 0 ? 'InStock' : 'Out of stock'}
+                                       {product.countInStock > 0 ? 'InStock' : 'Out of stock'}
                                     </Col>
                                  </Row>
                               </ListGroup.Item>
-                              {product.stockInCount > 0 && (
+                              {product.countInStock > 0 && (
                                  <ListGroup.Item>
                                     <Row>
                                        <Col>Qty:</Col>
