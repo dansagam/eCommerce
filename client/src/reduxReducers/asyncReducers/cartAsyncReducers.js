@@ -21,16 +21,42 @@ export const addNewCart = createAsyncThunk('cart/addNewCart',
             qty: qty,
             price: price
          }
-         const { data } = await axios.post('/', postData, config)
-
-         localStorage.setItem('cartItems', JSON.stringify(getState().Cart.cartItems))
+         const { data } = await axios.post('/api/carts', postData, config)
+         // console.log(data.data)
+         localStorage.setItem('cartItems', JSON.stringify(data.data.cartItems))
          return data.data
 
+      } catch (err) {
+         console.log(err.response)
+         throw new rejectWithValue(err.response)
+      }
+   }
+)
+
+export const getCartByUserId = createAsyncThunk('cart/getCartByUserId',
+   async ({ _id }, { rejectWithValue, getState }) => {
+      try {
+         const {
+            userLogin: {
+               userInfo
+            }
+         } = getState().User
+         const config = {
+            headers: {
+               Authorization: `Bearer ${userInfo.token}`
+            }
+         }
+         const { data } = await axios.get(`/api/carts`, config)
+
+         localStorage.setItem('cartItems', JSON.stringify(data.data.cartItems))
+         return data.data
       } catch (err) {
          throw new rejectWithValue(err.response)
       }
    }
 )
+
+
 
 export const getCartById = createAsyncThunk('cart/getCartById',
    async ({ _id }, { rejectWithValue, getState }) => {
@@ -45,7 +71,9 @@ export const getCartById = createAsyncThunk('cart/getCartById',
                Authorization: `Bearer ${userInfo.token}`
             }
          }
-         const { data } = await axios.get(`/${_id}`, config)
+         const { data } = await axios.get(`/api/carts/${_id}`, config)
+
+         localStorage.setItem('cartItems', JSON.stringify(data.data.cartItems))
          return data.data
       } catch (err) {
          throw new rejectWithValue(err.response)
@@ -67,7 +95,7 @@ export const updateCartToPaid = createAsyncThunk('cart/updateCartToPaid',
                Authorization: `Bearer ${userInfo.token}`
             }
          }
-         const { data } = await axios.put(`/${_id}/pay`, config)
+         const { data } = await axios.put(`/api/carts/${_id}/pay`, config)
          return data
 
       } catch (err) {
@@ -110,7 +138,8 @@ export const updateCartShippingAddress = createAsyncThunk('cart/updateCartShippi
                Authorization: `Bearer ${userInfo.token}`
             }
          }
-         const { data } = await axios.put(`/${_id}/shipping`, postedData, config)
+         const { data } = await axios.put(`/api/carts/${_id}/shipping`, postedData, config)
+         localStorage.setItem('shippingAddress', JSON.stringify(data.data.shippingAddress))
          return data.data
 
       } catch (err) {
@@ -136,7 +165,7 @@ export const updateCartDeliveryMode = createAsyncThunk('cart/updateCartDeliveryM
                Authorization: `Bearer ${userInfo.token}`
             }
          }
-         const { data } = await axios.put(`/${_id}/deliveryMode`, newData, config)
+         const { data } = await axios.put(`/api/carts/${_id}/deliveryMode`, newData, config)
          return data.data
       } catch (err) {
          throw new rejectWithValue(err.response)
@@ -157,9 +186,9 @@ export const deleteCartItem = createAsyncThunk('cart/deleteCartItem',
                Authorization: `Bearer ${userInfo.token}`
             }
          }
-         const { data } = await axios.delete(`/${_id}/item/${itemId}`, config)
+         const { data } = await axios.delete(`/api/carts/${_id}/item/${itemId}`, config)
 
-         localStorage.setItem('cartItems', JSON.stringify(getState().Cart.cartItems))
+         localStorage.setItem('cartItems', JSON.stringify(data.data.cartItems))
          return data.data
 
       } catch (err) {
@@ -182,14 +211,12 @@ export const updateCartItem = createAsyncThunk('cart/updateCartItem',
                Authorization: `Bearer ${userInfo.token}`
             }
          }
-         const { data } = await axios.put(`/${_id}/item/${itemId}`, { qty: qty }, config)
+         const { data } = await axios.put(`/api/carts/${_id}/item/${itemId}`, { qty: qty }, config)
 
-         localStorage.setItem('cartItems', JSON.stringify(getState().Cart.cartItems))
+         localStorage.setItem('cartItems', JSON.stringify(data.data.cartItems))
          return data.data
-
       } catch (err) {
          throw new rejectWithValue(err.response)
-
       }
    }
 )
