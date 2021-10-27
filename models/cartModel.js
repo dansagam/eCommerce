@@ -5,7 +5,7 @@ const cartSchema = mongoose.Schema(
       user: {
          type: mongoose.Schema.Types.ObjectId,
          required: true,
-         ref: 'User'
+         ref: 'User',
       },
       cartItems: [
          {
@@ -69,6 +69,13 @@ const cartSchema = mongoose.Schema(
       timestamps: true,
    }
 );
+
+
+// cartSchema.post('find', async function (docs) {
+//    for (let doc of docs) {
+//       await doc.populate({ path: 'cartItems', populate: { path: 'product' } })
+//    }
+// })
 
 
 const Cart = mongoose.model('Cart', cartSchema);
