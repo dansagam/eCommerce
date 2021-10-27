@@ -6,7 +6,8 @@ import {
    updateCartItem,
    updateCartToPaid,
    updateCartShippingAddress,
-   updateCartDeliveryMode
+   updateCartDeliveryMode,
+   getCartByUserId
 } from "../controllers/cartControllers.js";
 import { userAuth } from "../middlewares/authMiddlewares.js";
 
@@ -15,6 +16,7 @@ const router = express.Router()
 
 
 router.route('/')
+   .get(userAuth, getCartByUserId)
    .post(userAuth, addCartItems)
 
 router.route('/:id')
