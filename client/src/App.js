@@ -20,6 +20,7 @@ import UserCartScreen from './components/componentScreens/UserCartScreen';
 import AppHeader from './components/componentParts/AppHeader';
 import AppFooter from './components/componentParts/AppFooter';
 import ProductCreateScreen from './components/componentScreens/ProductCreateScreen';
+import CartDeliveryFormScreen from './components/componentScreens/CartDeliveryFormScreen';
 
 function App() {
    return (
@@ -32,6 +33,7 @@ function App() {
                   <Route path='/userplaceorder' component={PlaceOrderScreen} />
                   <Route path='/payment' component={UserPaymentScreen} />
                   <Route path='/shipping' component={ShipmentScreen} />
+                  <Route path='/deliverymode' component={CartDeliveryFormScreen} />
                   <Route path='/login' component={LoginScreen} />
                   <Route path='/register' component={RegistrationScreen} />
                   <Route path='/profile' component={UserProfileScreen} />
