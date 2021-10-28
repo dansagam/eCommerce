@@ -104,13 +104,14 @@ export const updateCartToPaid = createAsyncThunk('cart/updateCartToPaid',
    }
 )
 export const updateCartShippingAddress = createAsyncThunk('cart/updateCartShippingAddress',
-   async ({ _id, newData }, { rejectWithValue, getState }) => {
+   async (newData, { rejectWithValue, getState }) => {
       try {
          const { name: {
             firstName, lastName },
             address: {
                state, city, country, address, postalCode
-            }, phoneNumber
+            }, phoneNumber,
+            _id
          } = newData
          const postedData = {
             name: {
@@ -125,7 +126,7 @@ export const updateCartShippingAddress = createAsyncThunk('cart/updateCartShippi
                postalCode: postalCode
 
             },
-            phoneNumber: phoneNumber
+            phoneNumber: phoneNumber,
          }
          const {
             userLogin: {
