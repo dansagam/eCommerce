@@ -15,9 +15,9 @@ const cartSchema = mongoose.Schema(
       ],
       paymentMethod: {
          type: String,
-         enum: ['cash', 'online', 'bank'],
+         enum: ['Paypal', 'FlutterWave', 'Stripe', 'On Delivery'],
          required: true,
-         default: 'online',
+         default: 'On Delivery',
 
       },
       status: {
