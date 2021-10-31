@@ -7,7 +7,8 @@ import {
    updateCartToPaid,
    updateCartShippingAddress,
    updateCartDeliveryMode,
-   getCartByUserId
+   getCartByUserId,
+   updatePaymentMethod
 } from "../controllers/cartControllers.js";
 import { userAuth } from "../middlewares/authMiddlewares.js";
 
@@ -21,6 +22,9 @@ router.route('/')
 
 router.route('/:id')
    .get(userAuth, getCartById)
+
+router.route('/:id/paymentMode')
+   .put(userAuth, updatePaymentMethod)
 
 router.route('/:id/pay')
    .put(userAuth, updateCartToPaid)

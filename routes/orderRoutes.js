@@ -1,5 +1,6 @@
 import express from 'express'
 import {
+   createNewOrder,
    getMyOrders,
    getOrderById,
    getOrders,
@@ -12,6 +13,7 @@ const router = express.Router()
 
 router.route('/')
    .get(userAuth, adminAuth, getOrders)
+   .post(userAuth, createNewOrder)
 
 router.route('/myorders')
    .get(userAuth, getMyOrders)
