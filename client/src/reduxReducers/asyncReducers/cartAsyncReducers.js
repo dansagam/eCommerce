@@ -49,6 +49,7 @@ export const getCartByUserId = createAsyncThunk('cart/getCartByUserId',
          const { data } = await axios.get(`/api/carts`, config)
 
          localStorage.setItem('cartItems', JSON.stringify(data.data.cartItems))
+         localStorage.setItem('shippingAddress', JSON.stringify(data.data.shippingAddress))
          return data.data
       } catch (err) {
          throw new rejectWithValue(err.response)
@@ -74,6 +75,7 @@ export const getCartById = createAsyncThunk('cart/getCartById',
          const { data } = await axios.get(`/api/carts/${_id}`, config)
 
          localStorage.setItem('cartItems', JSON.stringify(data.data.cartItems))
+         localStorage.setItem('shippingAddress', JSON.stringify(data.data.shippingAddress))
          return data.data
       } catch (err) {
          throw new rejectWithValue(err.response)
@@ -192,6 +194,27 @@ export const deleteCartItem = createAsyncThunk('cart/deleteCartItem',
          localStorage.setItem('cartItems', JSON.stringify(data.data.cartItems))
          return data.data
 
+      } catch (err) {
+         throw new rejectWithValue(err.response)
+      }
+   }
+)
+export const updatePaymentMode = createAsyncThunk('cart/updatePaymentMode',
+   async ({ _id, paymentMode }, { getState, rejectWithValue }) => {
+      try {
+         const {
+            userLogin: {
+               userInfo
+            }
+         } = getState().User
+         const config = {
+            headers: {
+               'Content-Type': 'application/json',
+               Authorization: `Bearer ${userInfo.token}`
+            }
+         }
+         const { data } = await axios.put(`/api/carts/${_id}/paymentMode`, { paymentMode: paymentMode }, config)
+         return data.data
       } catch (err) {
          throw new rejectWithValue(err.response)
       }
