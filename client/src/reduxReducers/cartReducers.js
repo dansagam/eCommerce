@@ -7,7 +7,8 @@ import {
    updateCartDeliveryMode,
    updateCartItem,
    updateCartShippingAddress,
-   updateCartToPaid
+   updateCartToPaid,
+   updatePaymentMode
 } from "./asyncReducers/cartAsyncReducers"
 
 const cartItemsFromStorage = localStorage.getItem('cartItems')
@@ -29,7 +30,21 @@ export const CartReducers = createSlice({
       taxPrice: 0,
       isPaid: false,
       deliveryMode: '',
+      paymentMode: '',
       paidAt: null,
+      generalLoading: {
+         loadingCart: false,
+         loadingShipping: false
+      },
+      successGeneral: {
+         addCartSuccess: false,
+         updateSuccess: false,
+         updateDeliverySuccess: false,
+         updateCartItemSuccess: false,
+         paidSuccess: false,
+         addShippingSuccess: false,
+         getCartSuccess: false,
+      },
       addCartSuccess: false,
       updateSuccess: false,
       updateDeliverySuccess: false,
@@ -55,6 +70,13 @@ export const CartReducers = createSlice({
                cart_error_id: null
             }
          }
+      },
+      savePaymentMode: (state, action) => {
+         return {
+            ...state,
+            paymentMode: action.payload
+         }
+
       }
    },
    extraReducers: {
@@ -100,7 +122,9 @@ export const CartReducers = createSlice({
             getCartSuccess: true,
             loadingCart: false,
             cart: action.payload,
-            cartItems: action.payload.cartItems
+            cartItems: action.payload.cartItems,
+            shippingAddress: action.payload.shippingAddress,
+            paymentMode: action.payload.paymentMethod
          }
       },
       [getCartById.rejected]: (state, action) => {
@@ -128,7 +152,9 @@ export const CartReducers = createSlice({
             getCartSuccess: true,
             loadingCart: false,
             cart: action.payload,
-            cartItems: action.payload.cartItems
+            cartItems: action.payload.cartItems,
+            shippingAddress: action.payload.shippingAddress,
+            paymentMode: action.payload.paymentMethod
          }
       },
       [getCartByUserId.rejected]: (state, action) => {
@@ -170,6 +196,34 @@ export const CartReducers = createSlice({
                cart_error_id: action.payload.statusText
             },
 
+         }
+      },
+      [updatePaymentMode.pending]: (state, action) => {
+         return {
+            ...state,
+            loadingCart: true,
+            updateSuccess: false
+         }
+      },
+      [updatePaymentMode.fulfilled]: (state, action) => {
+         return {
+            ...state,
+            updateSuccess: true,
+            loadingCart: false,
+            cart: action.payload,
+            paymentMode: action.payload.paymentMethod
+         }
+      },
+      [updatePaymentMode.rejected]: (state, action) => {
+         return {
+            ...state,
+            updateSuccess: false,
+            loadingCart: false,
+            error: {
+               cart_error_msg: action.payload.data.message,
+               cart_error_status: action.payload.status,
+               cart_error_id: action.payload.statusText
+            },
          }
       },
       [updateCartShippingAddress.pending]: (state, action) => {
@@ -295,6 +349,6 @@ export const CartReducers = createSlice({
    }
 })
 
-export const { clearError } = CartReducers.actions
+export const { clearError, savePaymentMode } = CartReducers.actions
 
 export default CartReducers.reducer
