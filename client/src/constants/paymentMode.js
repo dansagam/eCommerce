@@ -7,3 +7,7 @@ export const paymentMethods = [
    'Stripe',
    'On Delivery'
 ]
+export const deliveryMethodsConst = [
+   "Door Delivery",
+   "Pickup Station"
+]
