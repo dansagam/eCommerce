@@ -10,8 +10,9 @@ import ShippingAddress from '../models/shippingAddressModel.js'
 
 export const getCartByUserId = async (req, res, next) => {
    try {
-      const cart = await Cart.findOne({ user: req.user._id })
+      const cart = await Cart.findOne({ user: req.user._id, status: 'active' })
          .populate({ path: 'cartItems', populate: { path: 'product' } })
+         .populate('shippingAddress')
       if (cart) {
          res.status(201).json({
             success: true,
@@ -37,6 +38,7 @@ export const getCartById = async (req, res, next) => {
    try {
       const cart = await Cart.findById(req.params.id)
          .populate({ path: 'cartItems', populate: { path: 'product' } })
+         .populate('shippingAddress')
       if (cart) {
          res.status(201).json({
             success: true,
@@ -66,7 +68,7 @@ export const addCartItems = async (req, res, next) => {
       const {
          product_id, qty, price
       } = req.body
-      const existingCart = await Cart.findOne({ user: req.user._id })
+      const existingCart = await Cart.findOne({ user: req.user._id, status: 'active' })
          .populate({ path: 'cartItems' })
       if (existingCart && existingCart.length !== 0) {
          const foundProduct = await Product.findById(product_id)
@@ -96,6 +98,7 @@ export const addCartItems = async (req, res, next) => {
                   (item.price * item.qty) + acc, 0)
                const updatedCart = await Cart.findByIdAndUpdate(existingCart._id, existingCart,
                   { new: true }).populate({ path: 'cartItems', populate: { path: 'product' } })
+                  .populate('shippingAddress')
                res.status(201).json({
                   success: true,
                   data: updatedCart
@@ -118,6 +121,8 @@ export const addCartItems = async (req, res, next) => {
                totalPrice: cartItem.price
             }
             const cart = await Cart.create(newCart)
+               .populate({ path: 'cartItems', populate: { path: 'product' } })
+               .populate('shippingAddress')
 
             res.status(201).json({
                success: true,
@@ -153,6 +158,7 @@ export const deleteCartItem = async (req, res, next) => {
             const updatedCart = await Cart.findByIdAndUpdate(foundCart._id, foundCart,
                { new: true }
             ).populate({ path: 'cartItems', populate: { path: 'product' } })
+               .populate('shippingAddress')
             const deletedItem = await CartItem.findByIdAndRemove(req.params.itemId)
             res.status(201).json({
                success: true,
@@ -203,7 +209,8 @@ export const updateCartShippingAddress = async (req, res, next) => {
             cart.shippingAddress = shippingAddress._id
             const updateCartShipping = await
                Cart.findByIdAndUpdate(cart._id, cart, { new: true }
-               ).populate({ path: 'cartItems', populate: { path: 'product' } }).populate('shippingAddress')
+               ).populate({ path: 'cartItems', populate: { path: 'product' } })
+                  .populate('shippingAddress')
             res.status(201).json({
                success: true,
                data: updateCartShipping
@@ -228,6 +235,7 @@ export const updateCartDeliveryMode = async (req, res, next) => {
       const foundCart = await Cart.findByIdAndUpdate(req.params.id,
          { deliveryMode: deliveryMode }, { new: true }
       ).populate({ path: 'cartItems', populate: { path: 'product' } })
+         .populate('shippingAddress')
       if (foundCart) {
          res.status(201).json({
             success: true,
@@ -252,6 +260,7 @@ export const updateCartItem = async (req, res, next) => {
       const updatedCartItem = await CartItem.findByIdAndUpdate(req.params.itemId,
          { qty: qty }, { new: true }
       ).populate({ path: 'cartItems', populate: { path: 'product' } })
+         .populate('shippingAddress')
       if (updatedCartItem) {
          res.status(201).json({
             success: true,
@@ -261,6 +270,30 @@ export const updateCartItem = async (req, res, next) => {
          res.status(401)
          throw new Error('Item could not be updated')
       }
+   } catch (err) {
+      res.status(401)
+      next(err)
+   }
+}
+export const updatePaymentMethod = async (req, res, next) => {
+   try {
+      console.log(req.body)
+      const { paymentMode } = req.body
+      const updatedCart = await Cart.findByIdAndUpdate(req.params.id,
+         { paymentMethod: paymentMode }, { new: true }
+      ).populate({ path: 'cartItems', populate: { path: 'product' } })
+         .populate('shippingAddress')
+
+      if (updatedCart) {
+         res.status(201).json({
+            success: true,
+            data: updatedCart
+         })
+      } else {
+         res.status(401)
+         throw new Error('Payment could not be updated')
+      }
+
    } catch (err) {
       res.status(401)
       next(err)
@@ -286,6 +319,7 @@ export const updateCartToPaid = async (req, res, next) => {
             const recentCart = await Cart.findByIdAndUpdate(req.params.id,
                { status: "inactive" }, { new: true }
             ).populate({ path: 'cartItems', populate: { path: 'product' } })
+               .populate('shippingAddress')
             if (recentCart) {
                const newCreatedOrder = await Order.create({
                   user: req.user._id,
