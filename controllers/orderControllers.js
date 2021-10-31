@@ -10,35 +10,60 @@ import Order from '../models/orderModel.js'
 
 export const getOrders = async (req, res, next) => {
    try {
-      const orders = await Order.find({}).populate('user', 'name email')
-      if(orders) {
+      const orders = await Order.find({})
+         .populate({ path: 'user', select: 'name email' })
+         .populate({
+            path: 'cart',
+            populate: {
+               path: 'cartItems'
+            },
+            populate: {
+               path: 'shippingAddress'
+            }
+         })
+      // .populate('user', 'name email')
+      if (orders) {
          res.status(201).json({
-            success: true, 
+            success: true,
             count: orders.length,
             data: orders
          })
-      }else{
+      } else {
          res.status(404)
          throw new Error('No Order Found')
       }
    } catch (err) {
       res.status(404)
       next(err)
-      
+
    }
 }
 
 
-export const getMyOrders = async(req, res, next) => {
+export const getMyOrders = async (req, res, next) => {
    try {
-      const orders = await Order.find({user: req.user._id})
-      if(orders){
+      const orders = await Order.find({ user: req.user._id })
+         .populate({ path: 'user', select: 'name email' })
+         .populate({
+            path: 'cart',
+            populate: {
+               path: 'cartItems'
+            },
+            populate: {
+               path: 'shippingAddress'
+            }
+         }).populate({
+            path: 'orderItems'
+         }).populate({
+            path: 'shippingAddress'
+         })
+      if (orders) {
          res.status(201).json({
             success: true,
             count: orders.length,
             data: orders
          })
-      }else{
+      } else {
          res.status(404)
          throw new Error('Order not found for users')
 
@@ -46,19 +71,34 @@ export const getMyOrders = async(req, res, next) => {
    } catch (err) {
       res.status(404)
       next(err)
-      
+
    }
 }
 
-export const getOrderById = async (req, res, next) =>{
+export const getOrderById = async (req, res, next) => {
    try {
-      const order = await Order.findById(req.params.id).populate('cart').populate('user', 'name email')
-      if(order){
+      const order = await Order.findById(req.params.id)
+         .populate({ path: 'user', select: 'name email' })
+         .populate({
+            path: 'cart',
+            populate: {
+               path: 'cartItems'
+            },
+            populate: {
+               path: 'shippingAddress'
+            }
+         }).populate({
+            path: 'orderItems'
+         }).populate({
+            path: 'shippingAddress'
+         })
+      // .populate('cart').populate('user', 'name email')
+      if (order) {
          res.status(201).json({
             success: true,
             data: order
          })
-      }else{
+      } else {
          res.status(404)
          throw new Error('Order not found for users')
       }
@@ -68,27 +108,136 @@ export const getOrderById = async (req, res, next) =>{
    }
 }
 
-
-export const updateOrderToDelivered = async(req, res, next) => {
+export const createNewOrder = async (req, res, next) => {
    try {
-      const order = await Order.findById(req.params.id).populate('cart')
-      if (order) {
-         order.isDelivered = true
-         order.deliveredAt = Date.now()
+      const {
+         cartId,
+         shippingAddress,
+         orderItems,
+         taxPrice,
+         shippingPrice,
+         totalPrice,
+         paymentMethod
 
-         const updatedOrder = await order.save()
+      } = req.body
+      const newData = {
+         user: req.user._id,
+         cart: cartId,
+         shippingAddress: shippingAddress,
+         orderItems: orderItems,
+         taxPrice: taxPrice,
+         shippingPrice: shippingPrice,
+         totalPrice: totalPrice,
+         paymentMethod: paymentMethod
+      }
+      const existingOrder = await Order.findOne({ cart: cartId }).populate('orderItems')
+      if (existingOrder && existingOrder.length !== 0) {
+         const foundCart = await Cart.findById(cartId)
+         // const foundOrderItem = existingOrder.orderItems.find(orderItem => orderItem._id !==foundCart.)
+         const updatedOrder = await Order.findByIdAndUpdate(existingOrder._id, newData)
+            .populate({ path: 'user', select: 'name email' })
+            .populate({
+               path: 'cart',
+               populate: {
+                  path: 'cartItems'
+               },
+               populate: {
+                  path: 'shippingAddress'
+               }
+            }).populate({
+               path: 'orderItems'
+            }).populate({
+               path: 'shippingAddress'
+            })
+         if (updatedOrder) {
+            const deactivatedCart = await Cart.findByIdAndUpdate(cartId,
+               { status: 'inactive' }, { new: true }
+            )
+            res.status(201).json({
+               success: true,
+               data: updatedOrder
+            })
+
+         } else {
+            res.status(401)
+            throw new Error('Order cannot be updated')
+         }
+
+      } else {
+         const newOrderCreated = await Order.create(newData)
+         if (newOrderCreated) {
+            const retrievedData = await Order.findById(newOrderCreated._id)
+               .populate({ path: 'user', select: 'name email' })
+               .populate({
+                  path: 'cart',
+                  populate: {
+                     path: 'cartItems'
+                  },
+                  populate: {
+                     path: 'shippingAddress'
+                  }
+               }).populate({
+                  path: 'orderItems'
+               }).populate({
+                  path: 'shippingAddress'
+               })
+            if (retrievedData) {
+               const deactivatedCart = await Cart.findByIdAndUpdate(cartId,
+                  { status: 'inactive' }, { new: true }
+               )
+               res.status(201).json({
+                  success: true,
+                  data: retrievedData
+               })
+
+            } else {
+               res.status(401)
+               throw new Error('creation Not successful')
+            }
+         } else {
+            res.status(401)
+            throw new Error('creation Not successful')
+         }
+
+      }
+   } catch (err) {
+      res.status(404)
+      next(err)
+   }
+}
+
+
+export const updateOrderToDelivered = async (req, res, next) => {
+   try {
+      const order = await Order.findByIdAndUpdate(req.params.id,
+         { isDelivered: true, deliveredAt: Date.now() }, { new: true })
+         .populate({ path: 'user', select: 'name email' })
+         .populate({
+            path: 'cart',
+            populate: {
+               path: 'cartItems'
+            },
+            populate: {
+               path: 'shippingAddress'
+            }
+         }).populate({
+            path: 'orderItems'
+         }).populate({
+            path: 'shippingAddress'
+         })
+      if (order) {
          res.status(201).json({
             success: true,
-            date: updatedOrder
+            date: order
          })
-      }else{
+      } else {
          res.status(404)
          throw new Error('Order not found')
       }
    } catch (err) {
       res.status(404)
       next(err)
-      
+
    }
 }
 
