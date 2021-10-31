@@ -1,23 +1,40 @@
 import React, { useState } from 'react'
-import {   Button, Form } from 'react-bootstrap'
-import { useSelector } from 'react-redux'
+import { useEffect } from 'react'
+import { Button, Form } from 'react-bootstrap'
+import { useDispatch, useSelector } from 'react-redux'
 import { paymentMethods } from '../../constants/paymentMode'
+import { getCartByUserId, updatePaymentMode } from '../../reduxReducers/asyncReducers/cartAsyncReducers'
+// import { savePaymentMode } from '../../reduxReducers/cartReducers'
 import FormHousing from '../componentParts/FormHousing'
 import StepsCheckout from '../componentParts/StepsCheckout'
 
-const UserPaymentScreen = ({history}) => {
+const UserPaymentScreen = ({ history }) => {
    const [paymentMode, setPaymentMode] = useState('FlutterWave')
-   const cart = useSelector(state => state.Cart)
-   // eslint-disable-next-line no-unused-vars
-   const {shippingAddress} = cart
+   const {
+      userLogin: {
+         userInfo
+      }
+   } = useSelector(state => state.User)
+   const dispatch = useDispatch()
+   const { cart, shippingAddress } = useSelector(state => state.Cart)
 
-   // if (!shippingAddress.address) {
-   //   history.push('/shipping')
-   // }
+   if (!shippingAddress.address.address) {
+      history.push('/shipping')
+   }
+   useEffect(() => {
+      if (!userInfo) {
+         history.push('/login')
+      } else {
+         if (!cart || cart.user !== userInfo._id) {
+            dispatch(getCartByUserId({ _id: userInfo._id }))
+         }
+      }
+   }, [history, userInfo, cart, dispatch])
 
 
-   const submitHandle =(e) =>{
+   const submitHandle = (e) => {
       e.preventDefault()
+      dispatch(updatePaymentMode({ _id: cart._id, paymentMode: paymentMode }))
       history.push('/userplaceorder')
    }
    return (
@@ -25,9 +42,9 @@ const UserPaymentScreen = ({history}) => {
          <StepsCheckout step1 step2 step3 />
          <Form onSubmit={submitHandle} >
             <Form.Label as='legend'>Select Method</Form.Label>
-            <Form.Group  className='d-flex m-3'>
+            <Form.Group className='d-flex m-3'>
                {paymentMethods.map((paymentMethod) => (
-                  <Form.Check 
+                  <Form.Check
                      inline
                      label={paymentMethod}
                      type='radio'
