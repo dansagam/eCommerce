@@ -24,7 +24,12 @@ const UserCartScreen = ({ match, location, history }) => {
    } = useSelector(state => state.User)
    const { cartItems, error, cart } = cartState
    const checkoutHandler = () => {
-      history.push('/login?redirect=shipping')
+      if (cart.shippingAddress) {
+         history.push('/login?redirect=deliverymode')
+      } else {
+         history.push('/login?redirect=shipping')
+
+      }
       // history.push('/shipping')
    }
    // console.log(qty)
