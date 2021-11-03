@@ -15,12 +15,32 @@ export const getOrders = async (req, res, next) => {
          .populate({
             path: 'cart',
             populate: {
-               path: 'cartItems'
+               path: 'cartItems',
+               populate: {
+                  path: 'product'
+               }
             },
             populate: {
                path: 'shippingAddress'
             }
+         }).populate({
+            path: 'orderItems',
+            populate: {
+               path: 'product'
+            }
+         }).populate({
+            path: 'shippingAddress'
          })
+      // .populate({ path: 'user', select: 'name email' })
+      // .populate({
+      //    path: 'cart',
+      //    populate: {
+      //       path: 'cartItems'
+      //    },
+      //    populate: {
+      //       path: 'shippingAddress'
+      //    }
+      // })
       // .populate('user', 'name email')
       if (orders) {
          res.status(201).json({
@@ -47,13 +67,19 @@ export const getMyOrders = async (req, res, next) => {
          .populate({
             path: 'cart',
             populate: {
-               path: 'cartItems'
+               path: 'cartItems',
+               populate: {
+                  path: 'product'
+               }
             },
             populate: {
                path: 'shippingAddress'
             }
          }).populate({
-            path: 'orderItems'
+            path: 'orderItems',
+            populate: {
+               path: 'product'
+            }
          }).populate({
             path: 'shippingAddress'
          })
@@ -82,13 +108,19 @@ export const getOrderById = async (req, res, next) => {
          .populate({
             path: 'cart',
             populate: {
-               path: 'cartItems'
+               path: 'cartItems',
+               populate: {
+                  path: 'product'
+               }
             },
             populate: {
                path: 'shippingAddress'
             }
          }).populate({
-            path: 'orderItems'
+            path: 'orderItems',
+            populate: {
+               path: 'product'
+            }
          }).populate({
             path: 'shippingAddress'
          })
@@ -139,13 +171,19 @@ export const createNewOrder = async (req, res, next) => {
             .populate({
                path: 'cart',
                populate: {
-                  path: 'cartItems'
+                  path: 'cartItems',
+                  populate: {
+                     path: 'product'
+                  }
                },
                populate: {
                   path: 'shippingAddress'
                }
             }).populate({
-               path: 'orderItems'
+               path: 'orderItems',
+               populate: {
+                  path: 'product'
+               }
             }).populate({
                path: 'shippingAddress'
             })
@@ -171,13 +209,19 @@ export const createNewOrder = async (req, res, next) => {
                .populate({
                   path: 'cart',
                   populate: {
-                     path: 'cartItems'
+                     path: 'cartItems',
+                     populate: {
+                        path: 'product'
+                     }
                   },
                   populate: {
                      path: 'shippingAddress'
                   }
                }).populate({
-                  path: 'orderItems'
+                  path: 'orderItems',
+                  populate: {
+                     path: 'product'
+                  }
                }).populate({
                   path: 'shippingAddress'
                })
@@ -215,13 +259,19 @@ export const updateOrderToDelivered = async (req, res, next) => {
          .populate({
             path: 'cart',
             populate: {
-               path: 'cartItems'
+               path: 'cartItems',
+               populate: {
+                  path: 'product'
+               }
             },
             populate: {
                path: 'shippingAddress'
             }
          }).populate({
-            path: 'orderItems'
+            path: 'orderItems',
+            populate: {
+               path: 'product'
+            }
          }).populate({
             path: 'shippingAddress'
          })
