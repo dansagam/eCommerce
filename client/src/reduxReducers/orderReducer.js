@@ -1,5 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit"
-import { createNewOrder } from './asyncReducers/orderAsyncReducers'
+import {
+   createNewOrder,
+   getMyOrders,
+   getOrderById,
+   getOrders,
+   updateOrderToDelivered
+} from './asyncReducers/orderAsyncReducers'
 
 
 export const OrderReducers = createSlice({
@@ -18,8 +24,8 @@ export const OrderReducers = createSlice({
       loading: {
          createLoading: false,
          deliveryLoading: false,
-         paymentLoadin: false,
-         getOrderLoading: false
+         paymentLoading: false,
+         getOrderLoading: true
       },
       success: {
          createSuccess: false,
@@ -41,8 +47,8 @@ export const OrderReducers = createSlice({
             loading: {
                createLoading: false,
                deliveryLoading: false,
-               paymentLoadin: false,
-               getOrderLoading: false
+               paymentLoading: false,
+               getOrderLoading: true
             },
             error_order: {
                order_msg: '',
@@ -66,7 +72,7 @@ export const OrderReducers = createSlice({
          }
 
       },
-      [createNewOrder.fulfiled]: (state, action) => {
+      [createNewOrder.fulfilled]: (state, action) => {
          return {
             ...state,
             loading: {
@@ -100,7 +106,136 @@ export const OrderReducers = createSlice({
 
          }
 
-      }
+      },
+      [getMyOrders.pending]: (state, action) => {
+         return {
+            ...state,
+            loading: {
+               getOrderLoading: true
+            }
+         }
+
+      },
+      [getMyOrders.fulfilled]: (state, action) => {
+         return {
+            ...state,
+            loading: {
+               getOrderLoading: false
+            },
+            success: {
+               getOrderSuccess: true
+            },
+            orders: action.payload,
+         }
+
+      },
+      [getMyOrders.rejected]: (state, action) => {
+         return {
+            ...state,
+            loading: {
+               getOrderLoading: false
+            },
+            success: {
+               getOrderSuccess: false
+            },
+            error_order: {
+               order_msg: action.payload.data.message,
+               order_status: action.payload.status,
+               order_error_id: action.payload.statusText
+            }
+         }
+
+      },
+      [getOrderById.pending]: (state, action) => {
+         return {
+            ...state,
+            loading: {
+               getOrderLoading: true
+            }
+         }
+
+      },
+      [getOrderById.fulfilled]: (state, action) => {
+         return {
+            ...state,
+            loading: {
+               getOrderLoading: false
+            },
+            success: {
+               getOrderSuccess: true
+            },
+            order: action.payload,
+            orderItems: action.payload.orderItems,
+            shippingAddress: action.payload.shippingAddress,
+            paymentMode: action.payload.paymentMethod
+         }
+
+      },
+      [getOrderById.rejected]: (state, action) => {
+         return {
+            ...state,
+            loading: {
+               getOrderLoading: false
+            },
+            success: {
+               getOrderSuccess: false
+            },
+            error_order: {
+               order_msg: action.payload.data.message,
+               order_status: action.payload.status,
+               order_error_id: action.payload.statusText
+            }
+         }
+
+      },
+      [getOrders.pending]: (state, action) => {
+         return {
+            ...state,
+            loading: {
+               getOrderLoading: true
+            }
+         }
+
+      },
+      [getOrders.fulfilled]: (state, action) => {
+         return {
+            ...state,
+            loading: {
+               getOrderLoading: false
+            },
+            success: {
+               getOrderSuccess: true
+            },
+            orders: action.payload,
+         }
+
+      },
+      [getOrders.rejected]: (state, action) => {
+         return {
+            ...state,
+            loading: {
+               getOrderLoading: false
+            },
+            success: {
+               getOrderSuccess: false
+            },
+            error_order: {
+               order_msg: action.payload.data.message,
+               order_status: action.payload.status,
+               order_error_id: action.payload.statusText
+            }
+         }
+
+      },
+      [updateOrderToDelivered.pending]: (state, action) => {
+
+      },
+      [updateOrderToDelivered.fulfilled]: (state, action) => {
+
+      },
+      [updateOrderToDelivered.rejected]: (state, action) => {
+
+      },
 
    }
 })
