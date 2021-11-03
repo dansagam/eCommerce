@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from 'react'
 import { Button } from 'react-bootstrap'
 import { Card, Col, Image, ListGroup, Row } from 'react-bootstrap'
