@@ -123,7 +123,7 @@ export const CartReducers = createSlice({
             loadingCart: false,
             cart: action.payload,
             cartItems: action.payload.cartItems,
-            shippingAddress: action.payload.shippingAddress,
+            shippingAddress: action.payload.shippingAddress || {},
             paymentMode: action.payload.paymentMethod
          }
       },
@@ -153,7 +153,7 @@ export const CartReducers = createSlice({
             loadingCart: false,
             cart: action.payload,
             cartItems: action.payload.cartItems,
-            shippingAddress: action.payload.shippingAddress,
+            shippingAddress: action.payload.shippingAddress || {},
             paymentMode: action.payload.paymentMethod
          }
       },
