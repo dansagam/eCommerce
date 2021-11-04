@@ -26,8 +26,8 @@ export const UserReducers = createSlice({
       isLoading: false,
       success: false,
       error: {
-         msg: null,
-         status: null,
+         msg: '',
+         status: undefined,
          id: null
       }
    },
