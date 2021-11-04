@@ -81,6 +81,7 @@ export const addCartItems = async (req, res, next) => {
             if (cartItem) {
                const updatedCart = await Cart.findById(existingCart._id)
                   .populate({ path: 'cartItems', populate: { path: 'product' } })
+                  .populate({ path: 'shippingAddress' })
                res.status(201).json({
                   success: true,
                   data: updatedCart
@@ -109,6 +110,7 @@ export const addCartItems = async (req, res, next) => {
             }
          }
       } else {
+         //for creating new cart in its entirety
          const cartItem = await CartItem.create({
             product: product_id,
             qty: qty,
@@ -121,12 +123,14 @@ export const addCartItems = async (req, res, next) => {
                totalPrice: cartItem.price
             }
             const cart = await Cart.create(newCart)
+
+            const addedCart = await Cart.findById(cart._id)
                .populate({ path: 'cartItems', populate: { path: 'product' } })
                .populate('shippingAddress')
 
             res.status(201).json({
                success: true,
-               data: cart
+               data: addedCart
             })
          } else {
             res.status(401)
@@ -229,6 +233,12 @@ export const updateCartShippingAddress = async (req, res, next) => {
    }
 }
 
+
+/*
+    @route  api/carts/:id/deliveryMode
+    @desc 
+    @access private
+*/
 export const updateCartDeliveryMode = async (req, res, next) => {
    try {
       const { deliveryMode } = req.body
@@ -277,7 +287,7 @@ export const updateCartItem = async (req, res, next) => {
 }
 export const updatePaymentMethod = async (req, res, next) => {
    try {
-      console.log(req.body)
+      // console.log(req.body)
       const { paymentMode } = req.body
       const updatedCart = await Cart.findByIdAndUpdate(req.params.id,
          { paymentMethod: paymentMode }, { new: true }
