@@ -49,7 +49,9 @@ export const getCartByUserId = createAsyncThunk('cart/getCartByUserId',
          const { data } = await axios.get(`/api/carts`, config)
 
          localStorage.setItem('cartItems', JSON.stringify(data.data.cartItems))
-         localStorage.setItem('shippingAddress', JSON.stringify(data.data.shippingAddress))
+         if (data.data.shippingAddress) {
+            localStorage.setItem('shippingAddress', JSON.stringify(data.data.shippingAddress))
+         }
          return data.data
       } catch (err) {
          throw new rejectWithValue(err.response)
@@ -75,7 +77,9 @@ export const getCartById = createAsyncThunk('cart/getCartById',
          const { data } = await axios.get(`/api/carts/${_id}`, config)
 
          localStorage.setItem('cartItems', JSON.stringify(data.data.cartItems))
-         localStorage.setItem('shippingAddress', JSON.stringify(data.data.shippingAddress))
+         if (data.data.shippingAddress) {
+            localStorage.setItem('shippingAddress', JSON.stringify(data.data.shippingAddress))
+         }
          return data.data
       } catch (err) {
          throw new rejectWithValue(err.response)
@@ -142,7 +146,9 @@ export const updateCartShippingAddress = createAsyncThunk('cart/updateCartShippi
             }
          }
          const { data } = await axios.put(`/api/carts/${_id}/shipping`, postedData, config)
-         localStorage.setItem('shippingAddress', JSON.stringify(data.data.shippingAddress))
+         if (data.data.shippingAddress) {
+            localStorage.setItem('shippingAddress', JSON.stringify(data.data.shippingAddress))
+         }
          return data.data
 
       } catch (err) {
