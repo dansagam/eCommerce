@@ -55,16 +55,16 @@ const RegistrationScreen = ({ location, history }) => {
             </FloatingLabel>
             <FloatingLabel className='mb-3' label='Email Address'>
                <Form.Control
-                  type='text'
+                  type='email'
                   name='name'
                   placeholder='Enter your email address'
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                />
             </FloatingLabel>
-            <FloatingLabel className='mb-3' label='Email Address'>
+            <FloatingLabel className='mb-3' label='Email your password'>
                <Form.Control
-                  type='text'
+                  type='password'
                   name='name'
                   placeholder='Enter your password'
                   value={password}
