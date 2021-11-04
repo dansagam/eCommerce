@@ -65,10 +65,10 @@ export const createProductReview = async (req, res, next) => {
             product.numReviews = await Reviews.countDocuments({ product_id: product._id })
             product.rating = (Number(reviewsData[0].reviewResult) / Number(product.numReviews)).toFixed(1)
             const newReviewedProduct = await Product.findByIdAndUpdate(product._id, product, { new: true })
+               .populate({ path: 'reviews' })
             // product.numReviews = product.reviews.length
             // product.rating =
             //    product.reviews.reduce((acc, item) => item.rating + acc, 0) / product.reviews.length
-
             // await product.save()
             res.status(201).json({
                message: 'Review added',
