@@ -43,13 +43,21 @@ export const UserReducers = createSlice({
             success: false,
             isAuthenticated: false,
             isLoading: false,
-            error: null
+            error: {
+               msg: '',
+               status: undefined,
+               id: null
+            }
          }
       },
       clearErrors: (state, action) => {
          return {
             ...state,
-            error: null,
+            error: {
+               msg: '',
+               status: undefined,
+               id: null
+            },
             success: false
          }
       }
