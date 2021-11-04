@@ -4,22 +4,29 @@ import User from "../models/userModel.js"
 
 
 
-const userAuth = async(req, res, next) => {
+const userAuth = async (req, res, next) => {
    try {
-      let token 
-      if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')){
+      let token
+      if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
          token = req.headers.authorization.split(' ')[1]
-         if(token){
+         if (token) {
             const decoded = jwt.verify(token, process.env.JWT_SECRET)
+            console.log(decoded)
+            if (decoded) {
+               req.user = await User.findById(decoded.id).select('-password')
 
-            req.user = await User.findById(decoded.id).select('-password')
+               next()
 
-            next()
-         }else{
+            } else {
+               res.status(401)
+               throw new Error('Not authorised, Authorisation failed')
+
+            }
+         } else {
             res.status(401)
             throw new Error('Not authorised, Authorisation failed')
          }
-      }else{
+      } else {
          res.status(404)
          throw new Error('Authourisation toke not provided')
       }
@@ -33,9 +40,9 @@ const userAuth = async(req, res, next) => {
 
 const adminAuth = (req, res, next) => {
    try {
-      if(req.user && req.user.isAdmin){
+      if (req.user && req.user.isAdmin) {
          next()
-      }else{
+      } else {
          res.status(401)
          throw new Error('Not authorised as an admin')
       }
@@ -48,11 +55,11 @@ const adminAuth = (req, res, next) => {
 
 const reviewOwnershipAuth = async (req, res, next) => {
    try {
-       req.reviews = await Reviews.findById(req.params.review_id)
-      if (req.reviews){
-         if(req.reviews.user.equals(req.user._id)){
+      req.reviews = await Reviews.findById(req.params.review_id)
+      if (req.reviews) {
+         if (req.reviews.user.equals(req.user._id)) {
             next()
-         }else{
+         } else {
             res.status(401)
             throw new Error('Ownership not verified')
          }
@@ -64,15 +71,15 @@ const reviewOwnershipAuth = async (req, res, next) => {
 }
 
 
-const statusCheck = async(req, res, next) =>{
+const statusCheck = async (req, res, next) => {
    try {
-      
+
    } catch (err) {
-      
+
    }
 }
 
 
 
 
-export {adminAuth, userAuth, reviewOwnershipAuth} 
+export { adminAuth, userAuth, reviewOwnershipAuth } 
