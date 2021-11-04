@@ -34,11 +34,13 @@ export const UserReducers = createSlice({
    reducers: {
       logoutSuccess: (state, action) => {
          localStorage.removeItem('userInfo')
+         localStorage.removeItem('cartItems')
+         localStorage.removeItem('shippingAddress')
          return {
             ...state,
             users: null,
             userLogin: {
-               userInfo: userInfoFromStorage
+               userInfo: {}
             },
             success: false,
             isAuthenticated: false,
