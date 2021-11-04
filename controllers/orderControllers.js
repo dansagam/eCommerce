@@ -4,7 +4,7 @@ import Order from '../models/orderModel.js'
 /*
     @route  api/orders
     @desc GET all cart available
-    @access pr
+    @access private Admin
 
 */
 
@@ -59,7 +59,11 @@ export const getOrders = async (req, res, next) => {
    }
 }
 
-
+/*
+    @route  api/orders/myorders
+    @desc get All orders of the users
+    @access private
+*/
 export const getMyOrders = async (req, res, next) => {
    try {
       const orders = await Order.find({ user: req.user._id })
@@ -101,6 +105,13 @@ export const getMyOrders = async (req, res, next) => {
    }
 }
 
+/*
+    @route  api/orders/:id
+    @desc GET order by params Id
+    @access private
+*/
+
+
 export const getOrderById = async (req, res, next) => {
    try {
       const order = await Order.findById(req.params.id)
@@ -140,6 +151,12 @@ export const getOrderById = async (req, res, next) => {
    }
 }
 
+
+/*
+    @route  api/order
+    @desc POST new order
+    @access private
+*/
 export const createNewOrder = async (req, res, next) => {
    try {
       const {
@@ -251,6 +268,12 @@ export const createNewOrder = async (req, res, next) => {
 }
 
 
+/*
+    @route  api/orders/:id/deliver
+    @desc PUT deliver
+    @access private
+*/
+
 export const updateOrderToDelivered = async (req, res, next) => {
    try {
       const order = await Order.findByIdAndUpdate(req.params.id,
@@ -290,4 +313,64 @@ export const updateOrderToDelivered = async (req, res, next) => {
 
    }
 }
+
+
+/*
+    @route  api/orders/:id/pay
+    @desc PUT update payment 
+    @access private
+*/
+
+export const orderPaymentUpdate = async (req, res, next) => {
+   try {
+      const foundOrder = await Order.findById(req.params.id)
+      if (foundOrder) {
+         foundOrder.isPaid = true
+         foundOrder.paidAt = Date.now()
+         foundOrder.paymentResult = {
+            id: req.body.id,
+            status: req.body.status,
+            update_time: req.body.update_time,
+            email_address: req.body.email_address
+         }
+         const updatedOrder = await Order.findByIdAndUpdate(req.params.id,
+            foundOrder, { new: true }
+         ).populate({ path: 'user', select: 'name email' })
+            .populate({
+               path: 'cart',
+               populate: {
+                  path: 'cartItems',
+                  populate: {
+                     path: 'product'
+                  }
+               },
+               populate: {
+                  path: 'shippingAddress'
+               }
+            }).populate({
+               path: 'orderItems',
+               populate: {
+                  path: 'product'
+               }
+            }).populate({
+               path: 'shippingAddress'
+            })
+         if (updatedOrder) {
+            res.status(201).json({
+               success: true,
+               data: updatedOrder
+            })
+         } else {
+            res.status(401)
+            throw new Error('Order payment not updated')
+         }
+      }
+   } catch (err) {
+      res.status(404)
+      next(err)
+   }
+}
+
+
+
 
