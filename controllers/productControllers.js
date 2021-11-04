@@ -176,7 +176,7 @@ export const createProductReview = async (req, res, next) => {
    try {
       const { rating, comment, name } = req.body
       const review = {
-         name: name,
+         name: req.user.name,
          comment: comment,
          rating: Number(rating),
          product_id: req.params.id
@@ -210,7 +210,7 @@ export const createProductReview = async (req, res, next) => {
             //    }
             // ])
             const reviewsData = await Reviews.aggregate()
-               .match({ product_id: mongoose.Types.ObjectId((req.params.id).toString()) })
+               .match({ product_id: product._id.toString() })
                .group({ _id: "$product_id", "reviewArr": { $push: "$rating" } })
                .project({
                   // "countedData": {$count: "$product_id"},
@@ -224,13 +224,18 @@ export const createProductReview = async (req, res, next) => {
                })
             product.numReviews = await Reviews.countDocuments({ product_id: req.params.id })
             product.rating = (Number(reviewsData[0].reviewResult) / Number(product.numReviews)).toFixed(1)
+            const newReviewedProduct = await Product.findByIdAndUpdate(product._id, product, { new: true })
+            if (newReviewedProduct) {
+               res.status(201).json({
+                  message: 'Review added',
+                  data: product,
+                  reviewData: reviewData
+               })
 
-            await product.save()
-            res.status(201).json({
-               message: 'Review added',
-               data: product,
-               reviewData: reviewData
-            })
+            } else {
+               res.status(401)
+               throw new Error('Product Review not added')
+            }
          }
          // product.rating = (
          //    reviewsData.reduce((acc, rData) => rData.rating + acc, 0) / 
@@ -249,9 +254,15 @@ export const createProductReview = async (req, res, next) => {
 }
 
 
+/*
+    @route  api/products/top
+    @desc get the top rated product list 
+    @access public
+*/
+
 export const getTopProduts = async (req, res, next) => {
    try {
-      const topProducts = await Product.find({}).sort({ rating: -1 }).limit(4)
+      const topProducts = await Product.find({}).sort({ rating: -1 }).limit(5)
       res.status(201).json({
          success: true,
          count: topProducts.length,
