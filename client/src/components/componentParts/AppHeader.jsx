@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Nav, NavDropdown, Navbar, Container, Image } from 'react-bootstrap'
 import { LinkContainer } from 'react-router-bootstrap'
@@ -8,12 +8,18 @@ import { faUser, faCartPlus } from '@fortawesome/free-solid-svg-icons'
 import { Route, useHistory } from 'react-router'
 import SearchContainer from './SearchContainer'
 import { logoutSuccess } from '../../reduxReducers/userReducers'
+import { getCartByUserId } from '../../reduxReducers/asyncReducers/cartAsyncReducers'
 
 const AppHeader = () => {
    const histon = useHistory()
    const dispatch = useDispatch()
+   let totalItem
    const { isAuthenticated } = useSelector(state => state.User)
    const { userInfo } = useSelector(state => state.User.userLogin)
+   const { cartItems } = useSelector(state => state.Cart)
+   if (userInfo) {
+      totalItem = cartItems.length
+   }
 
    const logoutHandler = () => {
       dispatch(logoutSuccess())
@@ -49,6 +55,12 @@ const AppHeader = () => {
       </NavDropdown>
    )
 
+   useEffect(() => {
+      if (userInfo) {
+         dispatch(getCartByUserId({ _id: userInfo._id }))
+      }
+   }, [dispatch, userInfo])
+
    return (
       <header>
          <Navbar bg="dark" variant="dark" expand="lg" sticky="top">
@@ -65,7 +77,15 @@ const AppHeader = () => {
                      navbarScroll
                   >
                      <LinkContainer to='/cart'>
-                        <Nav.Link><FontAwesomeIcon icon={faCartPlus} />Cart</Nav.Link>
+                        <Nav.Link className='position-relative'>
+                           <span
+                              className='position-absolute end-0 translate-middle badge rounded-pill bg-success'
+                           >
+                              {userInfo ? totalItem : 0}
+                           </span>
+                           <FontAwesomeIcon icon={faCartPlus} />
+                           Cart
+                        </Nav.Link>
                      </LinkContainer>
                      {isAuthenticated ? profileLink
                         : userInfo ? profileLink
