@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import bcrypt from 'bcryptjs'
+import crypto from 'crypto'
 
 const userSchema = new mongoose.Schema(
    {
@@ -7,7 +8,7 @@ const userSchema = new mongoose.Schema(
          type: String,
          required: true,
       },
-      password :{
+      password: {
          type: String,
          require: true
       },
@@ -25,6 +26,14 @@ const userSchema = new mongoose.Schema(
          enum: ['active', 'inactive'],
          required: true,
          default: 'active'
+      },
+      resetPasswordToken: {
+         type: String,
+         required: false
+      },
+      resetPasswordExpires: {
+         type: Date,
+         required: false
       }
    },
    {
@@ -33,25 +42,29 @@ const userSchema = new mongoose.Schema(
 );
 
 
-userSchema.methods.verifyPassword = async function(enteredPassword){
+userSchema.methods.verifyPassword = async function (enteredPassword) {
    return await bcrypt.compare(enteredPassword, this.password)
 }
 
-userSchema.pre('save', async function(next){
+userSchema.pre('save', async function (next) {
    try {
-      if(!this.isModified('password')) return next()
-   
+      if (!this.isModified('password')) return next()
+
       const rounds = await bcrypt.genSalt(10)
-   
+
       this.password = await bcrypt.hash(this.password, rounds);
    } catch (err) {
       return next(err)
    }
 })
+userSchema.methods.generatePasswordReset = async function () {
+   this.resetPasswordToken = crypto.randomBytes(20).toString('hex');
+   this.resetPasswordExpires = Date.now() + 360000;
+}
 
 
 
 const User = mongoose.model('User', userSchema);
 
 
- export default User
+export default User
