@@ -33,6 +33,29 @@ export const ProductReducers = createSlice({
       },
    },
    reducers: {
+      clearProductError: (state, action) => {
+         return {
+            ...state,
+            error: {
+               msg: '',
+               status: null,
+               id: null
+            },
+            updateSuccess: false,
+            createSuccess: false,
+            deleteSuccess: false,
+            reviewCreateSuccess: false,
+         }
+      },
+      clearProductSuccess: (state, action) => {
+         return {
+            ...state,
+            updateSuccess: false,
+            createSuccess: false,
+            deleteSuccess: false,
+            reviewCreateSuccess: false,
+         }
+      },
       getProduct: {
          reducer: (state, action) => {
             console.log(action.payload)
@@ -292,6 +315,12 @@ function escapeRegex(text) {
    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
 };
 
-export const { itemReviewCreation, getProduct, getProductDetailsById } = ProductReducers.actions
+export const {
+   itemReviewCreation,
+   getProduct,
+   getProductDetailsById,
+   clearProductError,
+   clearProductSuccess
+} = ProductReducers.actions
 
 export default ProductReducers.reducer
