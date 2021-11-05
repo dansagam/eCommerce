@@ -1,5 +1,7 @@
 import User from "../models/userModel.js";
 import generateToken from "../utils/generateToken.js";
+import sgMail from '@sendgrid/mail'
+sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
 
 
@@ -228,5 +230,139 @@ export const updateUserProfile = async (req, res, next) => {
       res.status(404)
       next(err)
 
+   }
+}
+
+
+
+/*
+    @route POST api/users/recovery
+    @desc to request for the password recovery
+    @access public
+*/
+export const userRecovery = async (req, res, next) => {
+   try {
+      const { email } = req.body
+      const existingUser = await User.findOne({ email: email })
+      if (existingUser) {
+         existingUser.generatePasswordReset()
+         const updatedUser = await User.findByIdAndUpdate(existingUser._id, existingUser, { new: true })
+         if (updatedUser) {
+            let link = 'http://' + req.headers.host + "/api/auth/reset" + updatedUser.resetPasswordToken
+            let text = `Hi ${updatedUser.name} \n
+            We received a request to reset the password for the 
+            account associated with this e-mail address. \n
+            Click the link below to reset your password using our secure server: \n
+            ${link}`
+            const mailOptions = {
+               to: updatedUser.email,
+               from: process.env.FROM_EMAIL,
+               subject: 'password change request',
+               text: text
+            }
+            const mailResult = sgMail.send(mailOptions)
+            if (mailResult) {
+               res.status(201).json({
+                  success: true,
+                  message: `A reset email has been sent to ${updatedUser.email}`
+               })
+            } else {
+               res.status(501)
+               throw new Error('Mail not sent')
+            }
+         } else {
+            res.status(401)
+            throw new Error('reset key not generated')
+         }
+      } else {
+         res.status(401)
+         throw new Error(`the email address ${email} is not associated with any account. 
+         Double-check your email address and try again.`)
+      }
+   } catch (err) {
+      res.status(404)
+      next(err)
+   }
+}
+
+
+/*
+    @route GET api/users/reset
+    @desc 
+    @access private
+*/
+
+
+export const getUserReset = async (req, res, next) => {
+   try {
+      const existingUserToken = await User.findOne({
+         resetPasswordToken: req.params.token,
+         resetPasswordExpires: { $gt: Date.now() }
+      })
+      if (existingUserToken) {
+         res.status(201).json({
+            success: true,
+            data: existingUserToken
+         })
+      } else {
+         res.status(401)
+         throw new Error(`Password token invalid`)
+      }
+   } catch (err) {
+      res.status(404)
+      next(err)
+   }
+}
+
+
+/*
+    @route POST api/
+    @desc 
+    @access public
+*/
+
+
+export const resetPassword = async (req, res, next) => {
+   try {
+      const { password } = req.body
+      const foundUser = await User.findOne({
+         resetPasswordToken: req.params.token,
+         resetPasswordExpires: { $gt: Date.now() }
+      })
+      if (foundUser) {
+         foundUser.password = password
+         foundUser.resetPasswordToken = undefined
+         foundUser.resetPasswordExpires = undefined
+         const updatedUser = await User.findByIdAndUpdate(foundUser._id, foundUser, { new: true })
+         if (updatedUser) {
+            let text = `Hi ${updatedUser.name} \n
+            This is to confirm that your password has been successfully changed`
+            const mailOptions = {
+               to: updatedUser.email,
+               from: process.env.FROM_EMAIL,
+               subject: 'password change request',
+               text: text
+            }
+            const mailSent = sgMail.send(mailOptions)
+            if (mailSent) {
+               res.status(201).json({
+                  success: true,
+                  message: 'Your Password has been updated'
+               })
+            } else {
+               res.status(501)
+               throw new Error('mail not sent')
+            }
+         } else {
+            res.status(401)
+            throw new Error(`password not updated`)
+         }
+      } else {
+         res.status(401)
+         throw new Error('Password token invalid')
+      }
+   } catch (err) {
+      res.status(404)
+      next(err)
    }
 }
