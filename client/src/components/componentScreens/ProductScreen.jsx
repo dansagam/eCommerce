@@ -3,8 +3,8 @@ import { Button, Card, Col, Form, Image, ListGroup, Row, FloatingLabel } from 'r
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { addNewCart } from '../../reduxReducers/asyncReducers/cartAsyncReducers'
-import { getProductById } from '../../reduxReducers/asyncReducers/productAsyncReducers'
-import { /**getProductDetailsById*/ itemReviewCreation } from '../../reduxReducers/productReducers'
+import { createReview, getProductById } from '../../reduxReducers/asyncReducers/productAsyncReducers'
+// import { /**getProductDetailsById*/ itemReviewCreation } from '../../reduxReducers/productReducers'
 import AppLoader from '../componentParts/AppLoader'
 import Message from '../componentParts/Message'
 import MetaData from '../componentParts/MetaData'
@@ -42,8 +42,9 @@ const ProductScreen = ({ history, match }) => {
 
    const submitHandler = (e) => {
       e.preventDefault()
-      dispatch(itemReviewCreation(match.params.id, { comment: comment, rating: rating }))
+      // dispatch(itemReviewCreation(match.params.id, { comment: comment, rating: rating }))
       // dispatch(getProductDetailsById(match.params.id))
+      dispatch(createReview({ _id: match.params.id, comment: comment, rating: rating }))
    }
    const addToCartHandler = () => {
       dispatch(addNewCart({
