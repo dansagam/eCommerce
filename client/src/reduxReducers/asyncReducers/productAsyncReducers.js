@@ -122,3 +122,35 @@ export const updateProduct = createAsyncThunk('product/updateProduct',
       }
    }
 )
+
+export const createReview = createAsyncThunk('product/createReview',
+   async (arg1, { getState, rejectWithValue }) => {
+      try {
+         const { _id, comment, rating } = arg1
+
+         const newData = {
+            comment: comment,
+            rating: rating
+         }
+         const {
+            userLogin: {
+               userInfo
+            }
+         } = getState().User
+         const config = {
+            headers: {
+               'Content-Type': 'application/json',
+               Authorization: `Bearer ${userInfo.token}`
+            }
+         }
+
+         const { data } = await axios.post(`/api/product/${_id}/reviews`, newData, config)
+         return data.data
+
+
+      } catch (err) {
+         throw new rejectWithValue(err.response)
+
+      }
+   }
+)

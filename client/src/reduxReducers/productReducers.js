@@ -1,6 +1,7 @@
 import { createSlice,/**nanoid*/ } from "@reduxjs/toolkit"
 import {
    createNewProduct,
+   createReview,
    deleteProduct,
    getProductById,
    getProductLists,
@@ -17,6 +18,7 @@ export const ProductReducers = createSlice({
       product: {
          reviews: []
       },
+      reviews: [],
       loading: false,
       status: false,
       // error: null,
@@ -304,6 +306,35 @@ export const ProductReducers = createSlice({
                id: action.payload.statusText
             }
             // error: action.payload.data.message
+         }
+      },
+      [createReview.pending]: (state, action) => {
+         return {
+            ...state,
+            loading: true,
+            reviewCreateSuccess: false,
+         }
+      },
+      [createReview.fulfilled]: (state, action) => {
+         return {
+            ...state,
+            loading: false,
+            reviewCreateSuccess: true,
+            product: action.payload,
+            reviews: action.payload.reviews
+         }
+      },
+      [createReview.rejected]: (state, action) => {
+         return {
+            ...state,
+            loading: false,
+            reviewCreateSuccess: false,
+            error: {
+               msg: action.payload.data.message,
+               status: action.payload.status,
+               id: action.payload.statusText
+            }
+
          }
       }
    }
