@@ -14,7 +14,7 @@ const userInfoFromStorage = localStorage.getItem('userInfo')
    ? JSON.parse(localStorage.getItem('userInfo')) : null
 
 
-export const UserReducers = createSlice({
+const UserReducers = createSlice({
    name: 'user',
    initialState: {
       users: [],

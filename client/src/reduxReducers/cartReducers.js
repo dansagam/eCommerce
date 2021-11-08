@@ -18,7 +18,7 @@ const shippingAddressFromStorage = localStorage.getItem('shippingAddress')
    ? JSON.parse(localStorage.getItem('shippingAddress'))
    : {}
 
-export const CartReducers = createSlice({
+const CartReducers = createSlice({
    name: 'cart',
    initialState: {
       carts: [],

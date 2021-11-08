@@ -8,7 +8,7 @@ import {
 } from './asyncReducers/orderAsyncReducers'
 
 
-export const OrderReducers = createSlice({
+const OrderReducers = createSlice({
    name: 'order',
    initialState: {
       orders: [],

@@ -10,7 +10,7 @@ import {
 } from "./asyncReducers/productAsyncReducers"
 
 
-export const ProductReducers = createSlice({
+const ProductReducers = createSlice({
    name: 'product',
    initialState: {
       products: [],
