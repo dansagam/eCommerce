@@ -3,6 +3,7 @@ import { render as rtlRender, screen, fireEvent } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import store from './store'
 import { MemoryRouter as Router, Route  /** useHistory, useParams, */ } from 'react-router-dom';
+import { createMemoryHistory } from "history";
 // import {createMemoryHistory} from 'history'
 // import App from './App';
 // import ProductScreen from './components/componentScreens/ProductScreen';
@@ -19,7 +20,7 @@ import OrderReducer from './reduxReducers/orderReducer';
 //    expect(linkElement).toBeInTheDocument();
 // });
 export const RenderWithHistory = (component) => {
-   // const history = useHistory()
+   const history = createMemoryHistory()
    // const { keyword, pageNumber } = useParams()
    return {
       ...rtlRender(
@@ -33,6 +34,7 @@ export const RenderWithHistory = (component) => {
                   }
                }
             }
+               history={history}
             >
                {component}
             </Router>
@@ -66,6 +68,7 @@ function render(
    }
 }
 export * from '@testing-library/react'
+export * from '@testing-library/user-event'
 export { render }
 // it('trying the react testing', () => {
 //    RenderWithHistory(<ProductScreen match={
