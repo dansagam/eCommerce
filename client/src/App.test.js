@@ -2,7 +2,7 @@
 import { render as rtlRender, screen, fireEvent } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import store from './store'
-import { MemoryRouter as Router, Route  /** useHistory, useParams, */ } from 'react-router-dom';
+import { MemoryRouter as Router, BrowserRouter as RouterB, Route  /** useHistory, useParams, */ } from 'react-router-dom';
 import { createMemoryHistory } from "history";
 // import {createMemoryHistory} from 'history'
 // import App from './App';
@@ -67,9 +67,34 @@ function render(
       ...rtlRender(ui, { wrapper: Wrapper, ...renderOption })
    }
 }
+function renderB(
+   ui,
+   { preloadedState, store = configureStore({
+      reducer: {
+         Cart: CartReducers,
+         User: UserReducers,
+         Order: OrderReducer,
+         Product: ProductReducers
+      }, preloadedState
+   }),
+      ...renderOption } = {}
+) {
+   function Wrapper({ children }) {
+      return (
+         <RouterB>
+            <Provider store={store}>
+               <Route path='/' render={() => children} />
+            </Provider>
+         </RouterB>
+      )
+   }
+   return {
+      ...rtlRender(ui, { wrapper: Wrapper, ...renderOption })
+   }
+}
 export * from '@testing-library/react'
 export * from '@testing-library/user-event'
-export { render }
+export { render, renderB }
 // it('trying the react testing', () => {
 //    RenderWithHistory(<ProductScreen match={
 //       {
