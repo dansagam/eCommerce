@@ -57,7 +57,6 @@ function App() {
                   </Route>
                   <Route path='/dashboard' component={AppDashboard} exact />
                </Container>
-
             </main>
             <AppFooter />
          </div>
